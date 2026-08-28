@@ -6,6 +6,7 @@ from utils.config import TrainingConfig, load_config
 DEFAULT_TRAINING_CONFIG = os.path.join(os.getcwd(), 'configs', 'training.yaml')
 
 def main():
+    # load training config
     argv = sys.argv
     try:
         idx = argv.index('--config')
@@ -16,6 +17,7 @@ def main():
 
     train_config: TrainingConfig = load_config(TrainingConfig, default_config_path=training_cfg_path)
 
+    # torchrun if distributed, else python
     if train_config.nproc_per_node > 1:
         launcher = [
             "torchrun",
@@ -26,6 +28,7 @@ def main():
     else:
         launcher = [sys.executable]
 
+    # top-level run root and export child processes can use
     run_root, run_name = prepare_pipeline_run_root(base_cwd=os.getcwd())
     os.environ['NG_RUN_ROOT_DIR'] = run_root
 
@@ -47,6 +50,7 @@ def main():
         if not run_command(latent_actions_cmd, "Latent Actions Training"):
             return
 
+    # need to get above checkpoints and pass in to dynamics
     video_tokenizer_checkpoint = find_latest_checkpoint(".", "video_tokenizer")
     latent_actions_checkpoint = find_latest_checkpoint(".", "latent_actions")
 
@@ -62,11 +66,11 @@ def main():
             return
 
     dynamics_checkpoint = find_latest_checkpoint(".", "dynamics")
-    print("\nResults Summary:")
+    print("\n📁 Results Summary:")
     print(f"Video Tokenizer: {video_tokenizer_checkpoint}")
     print(f"Latent Actions: {latent_actions_checkpoint}")
     print(f"Dynamics Model: {dynamics_checkpoint}")
 
 
 if __name__ == "__main__":
-    main()
+    main() 
