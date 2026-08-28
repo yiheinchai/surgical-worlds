@@ -23,7 +23,17 @@ ONSTART_CMD="curl -fsSL https://raw.githubusercontent.com/yiheinchai/surgical-wo
 ENV_FLAGS="-e DATA_SOURCE=${DATA_SOURCE} -e MAX_VIDEOS=${MAX_VIDEOS} -e TRAINING_CONFIG=${TRAINING_CONFIG} -e PRELOAD_RATIO=${PRELOAD_RATIO} -e TRAINING_MODE=${TRAINING_MODE}"
 RESULT=$(vastai create instance "$OFFER_ID" --image pytorch/pytorch:2.4.0-cuda12.4-cudnn9-runtime --disk "$DISK_GB" --ssh --direct --env "$ENV_FLAGS" --onstart-cmd "$ONSTART_CMD" 2>&1)
 echo "$RESULT"
-INSTANCE_ID=$(echo "$RESULT" | python3 -c "import sys,re; t=sys.stdin.read(); m=re.search(r'\"new_contract\":\s*(\d+)',t); print(m.group(1) if m else '')")
+INSTANCE_ID=$(echo "$RESULT" | python3 -c "
+import sys, re, ast
+text = sys.stdin.read()
+m = re.search(r'new_contract[\"\\']?\\s*[:=]\\s*(\\d+)', text)
+if m: print(m.group(1)); sys.exit(0)
+try:
+    d = ast.literal_eval(re.search(r'\\{.*\\}', text, re.S).group(0))
+    if d.get('new_contract'): print(d['new_contract'])
+except Exception: pass
+" 2>/dev/null || true)
 echo "Instance ID: $INSTANCE_ID"
+printf '{"instance_id":"%s","training_mode":"%s","data_source":"%s","launched_at":"%s"}\n' "$INSTANCE_ID" "$TRAINING_MODE" "$DATA_SOURCE" "$(date -Iseconds)" > /tmp/surgical_worlds_launch.json
 [ -n "$INSTANCE_ID" ] && bash "$REPO_ROOT/scripts/wait_for_health.sh" "$INSTANCE_ID" 15 || true
 echo "Monitor: bash scripts/monitor_training.sh $INSTANCE_ID"
