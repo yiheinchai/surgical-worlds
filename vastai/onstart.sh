@@ -18,7 +18,6 @@ nvidia-smi || true
 apt-get update -qq && apt-get install -y -qq git ffmpeg aria2 libgl1 libglib2.0-0 2>/dev/null || true
 
 # Clone or update repo
-git -C "$REPO_DIR" fetch origin "$BRANCH" 2>/dev/null || true
 if [ -d "$REPO_DIR/.git" ]; then
   log "Updating existing repo at $REPO_DIR"
   git -C "$REPO_DIR" fetch origin "$BRANCH"
