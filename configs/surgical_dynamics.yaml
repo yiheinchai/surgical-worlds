@@ -1,0 +1,18 @@
+# Training — dynamics model for surgical world simulation
+batch_size_per_gpu: 96
+gradient_accumulation_steps: 2
+n_updates: 400000
+learning_rate: 0.005
+log_interval: 2000
+
+use_actions: true
+
+embed_dim: 48
+num_heads: 8
+hidden_dim: 192
+num_blocks: 10
+
+video_tokenizer_path:
+latent_actions_path:
+
+checkpoint:

@@ -1,0 +1,15 @@
+# SurgicalWorlds simulator (Genie 3 for surgery)
+host: "0.0.0.0"
+port: 7860
+share: false
+
+# Engine
+surgery_type: laparoscopic  # laparoscopic | robotic
+use_trained_model: false    # set true after training checkpoints exist
+device: cuda                # cuda | cpu | mps
+temperature: 0.4
+context_window: 4
+maskgit_steps: 8
+
+# Dataset for seeding new procedures (model mode)
+dataset: LAPAROSCOPIC
