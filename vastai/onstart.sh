@@ -55,6 +55,9 @@ DATASET="${DATASET:-LAPAROSCOPIC}"
 PRELOAD_RATIO="${PRELOAD_RATIO:-0.1}"
 WANDB_PROJECT="${WANDB_PROJECT:-surgical-worlds}"
 
-log "Starting training: dataset=$DATASET preload_ratio=$PRELOAD_RATIO"
-export DATASET PRELOAD_RATIO
+log "Starting training: dataset=$DATASET preload_ratio=$PRELOAD_RATIO config=${TRAINING_CONFIG:-configs/quick_training.yaml}"
+export DATASET PRELOAD_RATIO TRAINING_CONFIG
 bash vastai/train.sh 2>&1 | tee -a "$LOG"
+
+log "Training finished — starting post-training (upload + simulator)"
+bash vastai/post_train.sh 2>&1 | tee -a "$LOG"
