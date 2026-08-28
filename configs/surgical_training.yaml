@@ -1,0 +1,53 @@
+# Surgical World Model training config (extends TinyWorlds Genie architecture)
+# Train on laparoscopic or robotic laparoscopic surgical videos
+
+# wandb
+use_wandb: true
+wandb_project: surgical-worlds
+
+# dataset: LAPAROSCOPIC (manual) or ROBOTIC_LAPAROSCOPIC (da Vinci / EndoVis-style)
+dataset: LAPAROSCOPIC
+preload_ratio: 0.05  # start small; increase as training stabilizes
+
+# shared model params — tuned for surgical video detail
+patch_size: 4
+context_length: 4
+frame_size: 128
+latent_dim: 6
+num_bins: 4
+n_actions: 8  # more latent actions for instrument motion diversity
+
+# performance
+amp: true
+tf32: true
+compile: true
+
+# distributed launch
+distributed:
+  use_ddp: false
+  use_fsdp: false
+  reshard_after_forward: false
+nproc_per_node: 1
+standalone: true
+
+# stage configs
+video_tokenizer_config: configs/surgical_video_tokenizer.yaml
+latent_actions_config: configs/surgical_latent_actions.yaml
+dynamics_config: configs/surgical_dynamics.yaml
+
+# which stages to run
+run_video_tokenizer: true
+run_latent_actions: true
+run_dynamics: true
+
+optimizer: "adamw"
+muon_momentum: 0.95
+muon_backend_steps: 5
+
+use_moe: false
+num_experts: 4
+top_k_experts: 2
+moe_aux_loss_coeff: 0.01
+
+# surgical-specific sampling
+fps: 10

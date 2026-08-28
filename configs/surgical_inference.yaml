@@ -1,0 +1,30 @@
+# paths
+video_tokenizer_path:
+latent_actions_path:
+dynamics_path:
+use_latest_checkpoints: true
+
+# inference params
+dataset: LAPAROSCOPIC
+preload_ratio:
+device: cuda
+generation_steps: 15
+context_window: 4
+fps: 5
+temperature: 0.4
+teacher_forced: false
+prediction_horizon: 1
+
+# action selection modes (lower takes priority)
+use_actions: false
+use_gt_actions: false
+use_interactive_mode: true
+
+# inference acceleration
+amp: true
+tf32: true
+compile: false
+
+# surgery simulation
+surgery_type: laparoscopic  # laparoscopic | robotic
+show_action_legend: true
