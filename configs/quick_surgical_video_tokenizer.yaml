@@ -1,5 +1,5 @@
-batch_size_per_gpu: 64
-gradient_accumulation_steps: 2
+batch_size_per_gpu: 8
+gradient_accumulation_steps: 8
 n_updates: 4000
 learning_rate: 0.001
 log_interval: 500
