@@ -15,6 +15,7 @@ jobs:
       - name: Download PNG assets from upstream TinyWorlds
         run: |
           set -euo pipefail
+          mkdir -p assets
           UPSTREAM="https://raw.githubusercontent.com/AlmondGod/tinyworlds/main/assets"
           for f in \
             actiontokenizer.png datasets_stylized.png dynamicsmodel.png \
@@ -22,8 +23,11 @@ jobs:
             tinyworldsdark.png tinyworldslight.png tinyworlds.png videotokenizer.png
           do
             echo "Downloading $f..."
+            rm -f "assets/$f"
             curl -fsSL "$UPSTREAM/$f" -o "assets/$f"
-            ls -la "assets/$f"
+            SIZE=$(wc -c < "assets/$f")
+            echo "assets/$f: $SIZE bytes"
+            test "$SIZE" -gt 1000
           done
       - name: Commit synced assets
         run: |
