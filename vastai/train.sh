@@ -7,6 +7,7 @@ cd "$WORK_DIR"
 
 export PYTHONPATH="${WORK_DIR}:${PYTHONPATH:-}"
 export NG_RUN_ROOT_DIR="${NG_RUN_ROOT_DIR:-/workspace/results/surgical-worlds-$(date +%Y%m%d_%H%M%S)}"
+export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
 TRAINING_CONFIG="${TRAINING_CONFIG:-configs/quick_training.yaml}"
 DATASET="${DATASET:-LAPAROSCOPIC}"
