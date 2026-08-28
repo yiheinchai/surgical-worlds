@@ -16,7 +16,7 @@ n_actions: 8
 
 amp: true
 tf32: true
-compile: true
+compile: false
 
 distributed:
   use_ddp: false
