@@ -6,7 +6,6 @@ from utils.config import TrainingConfig, load_config
 DEFAULT_TRAINING_CONFIG = os.path.join(os.getcwd(), 'configs', 'training.yaml')
 
 def main():
-    # load training config
     argv = sys.argv
     try:
         idx = argv.index('--config')
@@ -17,60 +16,39 @@ def main():
 
     train_config: TrainingConfig = load_config(TrainingConfig, default_config_path=training_cfg_path)
 
-    # torchrun if distributed, else python
     if train_config.nproc_per_node > 1:
-        launcher = [
-            "torchrun",
-            "--nproc_per_node", str(train_config.nproc_per_node),
-        ]
+        launcher = ["torchrun", "--nproc_per_node", str(train_config.nproc_per_node)]
         if train_config.standalone:
             launcher += ["--standalone"]
     else:
         launcher = [sys.executable]
 
-    # top-level run root and export child processes can use
     run_root, run_name = prepare_pipeline_run_root(base_cwd=os.getcwd())
     os.environ['NG_RUN_ROOT_DIR'] = run_root
 
     if train_config.run_video_tokenizer:
-        v_cmd = launcher + [
-            "scripts/train_video_tokenizer.py",
-            "--config", train_config.video_tokenizer_config,
-            "--training_config", training_cfg_path,
-        ]
+        v_cmd = launcher + ["scripts/train_video_tokenizer.py", "--config", train_config.video_tokenizer_config, "--training_config", training_cfg_path]
         if not run_command(v_cmd, "Video Tokenizer Training"):
-            return
+            sys.exit(1)
 
     if train_config.run_latent_actions:
-        latent_actions_cmd = launcher + [
-            "scripts/train_latent_actions.py",
-            "--config", train_config.latent_actions_config,
-            "--training_config", training_cfg_path,
-        ]
+        latent_actions_cmd = launcher + ["scripts/train_latent_actions.py", "--config", train_config.latent_actions_config, "--training_config", training_cfg_path]
         if not run_command(latent_actions_cmd, "Latent Actions Training"):
-            return
+            sys.exit(1)
 
-    # need to get above checkpoints and pass in to dynamics
     video_tokenizer_checkpoint = find_latest_checkpoint(".", "video_tokenizer")
     latent_actions_checkpoint = find_latest_checkpoint(".", "latent_actions")
 
     if train_config.run_dynamics:
-        dyn_cmd = launcher + [
-            "scripts/train_dynamics.py",
-            "--config", train_config.dynamics_config,
-            "--training_config", training_cfg_path,
-            f"video_tokenizer_path={video_tokenizer_checkpoint}",
-            f"latent_actions_path={latent_actions_checkpoint}",
-        ]
+        dyn_cmd = launcher + ["scripts/train_dynamics.py", "--config", train_config.dynamics_config, "--training_config", training_cfg_path, f"video_tokenizer_path={video_tokenizer_checkpoint}", f"latent_actions_path={latent_actions_checkpoint}"]
         if not run_command(dyn_cmd, "Dynamics Model Training"):
-            return
+            sys.exit(1)
 
     dynamics_checkpoint = find_latest_checkpoint(".", "dynamics")
-    print("\n📁 Results Summary:")
+    print("\nResults Summary:")
     print(f"Video Tokenizer: {video_tokenizer_checkpoint}")
     print(f"Latent Actions: {latent_actions_checkpoint}")
     print(f"Dynamics Model: {dynamics_checkpoint}")
 
-
 if __name__ == "__main__":
-    main() 
+    main()
