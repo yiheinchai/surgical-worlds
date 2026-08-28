@@ -1,0 +1,38 @@
+name: Sync PNG Assets
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/sync-png-assets.yml
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PNG assets from upstream TinyWorlds
+        run: |
+          set -euo pipefail
+          UPSTREAM="https://raw.githubusercontent.com/AlmondGod/tinyworlds/main/assets"
+          for f in \
+            actiontokenizer.png datasets_stylized.png dynamicsmodel.png \
+            finitescalarquantizer.png spacetimetransformer.png tinyworldsarchv3.png \
+            tinyworldsdark.png tinyworldslight.png tinyworlds.png videotokenizer.png
+          do
+            echo "Downloading $f..."
+            curl -fsSL "$UPSTREAM/$f" -o "assets/$f"
+            ls -la "assets/$f"
+          done
+      - name: Commit synced assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/*.png
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Sync PNG assets from AlmondGod/tinyworlds upstream"
+            git push
+          fi
