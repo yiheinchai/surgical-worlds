@@ -61,13 +61,20 @@ if [ ! -f "data/surgical/train_laparoscopic_frames.h5" ]; then
   DATA_SOURCE="${DATA_SOURCE:-demo}"
   write_status downloading source="$DATA_SOURCE"
   log "Downloading surgical data (source=$DATA_SOURCE)"
-  python3 scripts/download_surgical_data.py \
+  if ! python3 scripts/download_surgical_data.py \
     --source "$DATA_SOURCE" \
     ${DATA_DOWNLOAD_URL:+--url "$DATA_DOWNLOAD_URL"} \
     ${HF_DATASET_REPO:+--hf-repo "$HF_DATASET_REPO"} \
     --surgery-type "${SURGERY_TYPE:-laparoscopic}" \
     --max-videos "${MAX_VIDEOS:-10}" \
-    --read-step "${READ_STEP:-2}"
+    --read-step "${READ_STEP:-2}"; then
+    log "Data download failed — falling back to demo data"
+    write_status downloading source=demo_fallback
+    python3 scripts/download_surgical_data.py \
+      --source demo \
+      --surgery-type "${SURGERY_TYPE:-laparoscopic}" \
+      --read-step "${READ_STEP:-2}"
+  fi
 fi
 
 DATASET="${DATASET:-LAPAROSCOPIC}"
