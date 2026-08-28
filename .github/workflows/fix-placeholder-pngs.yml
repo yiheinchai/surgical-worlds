@@ -1,0 +1,32 @@
+name: Fix Placeholder PNGs
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/fix-placeholder-pngs.yml
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Force re-download placeholder PNGs
+        run: |
+          set -euo pipefail
+          UPSTREAM="https://raw.githubusercontent.com/AlmondGod/tinyworlds/main/assets"
+          for f in tinyworldslight.png tinyworldsdark.png; do
+            rm -f "assets/$f"
+            curl -fsSL "$UPSTREAM/$f" -o "assets/$f"
+            SIZE=$(wc -c < "assets/$f")
+            echo "assets/$f: $SIZE bytes"
+            test "$SIZE" -gt 100000
+          done
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/tinyworldslight.png assets/tinyworldsdark.png
+          git commit -m "Fix placeholder PNG assets (tinyworldslight, tinyworldsdark)"
+          git push
