@@ -14,10 +14,11 @@ log() { echo "[$(date -Iseconds)] $*" | tee -a "$LOG"; }
 log "=== SurgicalWorlds Vast.ai onstart ==="
 nvidia-smi || true
 
-# System deps
-apt-get update -qq && apt-get install -y -qq git ffmpeg libgl1 libglib2.0-0 2>/dev/null || true
+# System deps (aria2 for fast multi-connection downloads on Vast.ai)
+apt-get update -qq && apt-get install -y -qq git ffmpeg aria2 libgl1 libglib2.0-0 2>/dev/null || true
 
 # Clone or update repo
+git -C "$REPO_DIR" fetch origin "$BRANCH" 2>/dev/null || true
 if [ -d "$REPO_DIR/.git" ]; then
   log "Updating existing repo at $REPO_DIR"
   git -C "$REPO_DIR" fetch origin "$BRANCH"
@@ -31,15 +32,23 @@ fi
 cd "$REPO_DIR"
 export PYTHONPATH="$REPO_DIR:$PYTHONPATH"
 
-# Python deps
+# Python deps (upgrades torch to version in requirements.txt)
 pip install -q --upgrade pip
 pip install -q -r requirements.txt
+# Gradio not needed on training instances
+pip install -q torch torchvision --upgrade 2>/dev/null || true
 
 # Prepare demo data if no surgical data uploaded
 if [ ! -f "data/surgical/train_laparoscopic_frames.h5" ]; then
-  log "No surgical data found — generating demo dataset"
-  python3 scripts/generate_demo_surgical_video.py
-  python3 scripts/prepare_surgical_data.py --input data/surgical/demo/laparoscopic_demo.mp4
+  DATA_SOURCE="${DATA_SOURCE:-demo}"
+  log "Downloading surgical data (source=$DATA_SOURCE) — Vast.ai has fast datacenter bandwidth"
+  python3 scripts/download_surgical_data.py \
+    --source "$DATA_SOURCE" \
+    ${DATA_DOWNLOAD_URL:+--url "$DATA_DOWNLOAD_URL"} \
+    ${HF_DATASET_REPO:+--hf-repo "$HF_DATASET_REPO"} \
+    --surgery-type "${SURGERY_TYPE:-laparoscopic}" \
+    --max-videos "${MAX_VIDEOS:-10}" \
+    --read-step "${READ_STEP:-2}"
 fi
 
 # Training overrides from env

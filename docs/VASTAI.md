@@ -25,12 +25,62 @@ WANDB_API_KEY=your_key ./scripts/vastai_launch.sh 12345678
 The instance will automatically:
 1. Clone `yiheinchai/surgical-worlds` from GitHub
 2. Install dependencies
-3. Generate demo surgical data (if no data uploaded)
-4. Run full 3-stage training (`configs/surgical_training.yaml`)
+3. **Download surgical data on the remote machine** (fast datacenter bandwidth)
+4. Run full 3-stage training (`configs/vastai_training.yaml`)
 
 Training log: `/workspace/vastai_train.log`
 
-## 3. SSH into instance
+## 3. Download surgical data on the remote instance (recommended)
+
+Vast.ai machines have very fast download speeds — **don't upload from home**. Let the instance fetch data directly.
+
+### Option A — CholecT50 from HuggingFace (10 videos, no registration)
+
+```bash
+DATA_SOURCE=cholect50 MAX_VIDEOS=10 bash vastai/launch.sh <OFFER_ID>
+```
+
+Downloads laparoscopic cholecystectomy frame sequences from `Voxel51/cholect50` on HuggingFace, stitches to MP4, and prepares training HDF5.
+
+### Option B — Direct archive URL (Cholec80, HeiChole mirror, your cloud storage)
+
+After you get dataset access (CAMMA form, Synapse, etc.), host or use a direct download link:
+
+```bash
+DATA_SOURCE=url \
+DATA_DOWNLOAD_URL="https://your-storage.com/cholec80.tar.gz" \
+DISK_GB=120 \
+bash vastai/launch.sh <OFFER_ID>
+```
+
+Supports `.tar.gz`, `.zip`, `.tar`. Uses `aria2c` (16 connections) for maximum speed.
+
+### Option C — HuggingFace video dataset
+
+```bash
+DATA_SOURCE=huggingface \
+HF_DATASET_REPO="orena-dkfz/lapchole-focus-vqa" \
+HF_TOKEN=your_hf_token \
+MAX_VIDEOS=20 \
+bash vastai/launch.sh <OFFER_ID>
+```
+
+### Option D — Demo only (pipeline test)
+
+```bash
+DATA_SOURCE=demo bash vastai/launch.sh <OFFER_ID>
+```
+
+### Manual download on a running instance
+
+```bash
+vastai ssh <INSTANCE_ID>
+cd /workspace/surgical-worlds
+python3 scripts/download_surgical_data.py --source cholect50 --max-videos 20
+python3 scripts/download_surgical_data.py --source url --url "https://..."
+```
+
+## 4. SSH into instance
 
 ```bash
 vastai show instances
@@ -38,25 +88,17 @@ vastai ssh <INSTANCE_ID>
 tail -f /workspace/vastai_train.log
 ```
 
-## 4. Train on your own surgical videos
+## 5. Train on your own surgical videos (alternative to remote download)
 
-Upload videos to the instance, then prepare data before training:
+If you already have videos on the instance (e.g. from a completed download):
 
 ```bash
-# On the Vast.ai instance
 cd /workspace/surgical-worlds
-# Upload videos to /workspace/videos/ via scp or vastai copy
-python3 scripts/prepare_surgical_data.py --input /workspace/videos/
-DATASET=LAPAROSCOPIC PRELOAD_RATIO=1.0 bash vastai/onstart.sh
+python3 scripts/prepare_surgical_data.py --input /workspace/surgical/downloads/extracted/videos/
+PRELOAD_RATIO=1.0 bash vastai/train.sh
 ```
 
-Or set env vars at launch time:
-
-```bash
-DATASET=LAPAROSCOPIC PRELOAD_RATIO=0.5 WANDB_API_KEY=xxx ./scripts/vastai_launch.sh <OFFER_ID>
-```
-
-## 5. Spot / interruptible instances
+## 6. Spot / interruptible instances
 
 The `vastai/onstart.sh` script re-runs on every container start (including spot resume). Training checkpoints are saved under `results/` — increase `preload_ratio` gradually as training stabilizes.
 
@@ -75,12 +117,15 @@ Set minimum VRAM: `MIN_GPU_RAM=24 ./scripts/vastai_launch.sh`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `DATA_SOURCE` | `demo` | `demo`, `url`, `huggingface`, `cholect50` |
+| `DATA_DOWNLOAD_URL` | — | Direct archive URL (for `DATA_SOURCE=url`) |
+| `HF_DATASET_REPO` | `orena-dkfz/lapchole-focus-vqa` | HuggingFace dataset repo |
+| `HF_TOKEN` | — | HuggingFace token for gated datasets |
+| `MAX_VIDEOS` | `10` | Limit videos downloaded |
+| `DISK_GB` | `80` | Disk space (use 120+ for Cholec80 archives) |
 | `WANDB_API_KEY` | — | Weights & Biases logging |
-| `HF_TOKEN` | — | HuggingFace token for dataset download |
 | `DATASET` | `LAPAROSCOPIC` | `LAPAROSCOPIC` or `ROBOTIC_LAPAROSCOPIC` |
 | `PRELOAD_RATIO` | `0.1` | Fraction of dataset to use (increase over time) |
-| `REPO_URL` | `yiheinchai/surgical-worlds` | Git repo to clone |
-| `BRANCH` | `main` | Git branch |
 
 ## Cost estimate
 
