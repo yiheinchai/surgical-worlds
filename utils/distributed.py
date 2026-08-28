@@ -10,7 +10,11 @@ from typing import Dict, Iterable
 from utils.config import DistributedConfig
 
 
+
 def init_distributed_from_env() -> Dict[str, object]:
+    """Initialize DeviceMesh from torchrun env vars.
+    Returns a context dict with is_distributed, world_size, is_main, device_mesh.
+    """
     world_size = int(os.environ.get('WORLD_SIZE', '1'))
     is_distributed = world_size > 1 and torch.cuda.is_available()
 
@@ -91,4 +95,4 @@ def print_param_count_if_main(model: torch.nn.Module, model_name: str, is_main: 
 
 def cleanup_distributed(is_distributed: bool) -> None:
     if is_distributed and dist.is_initialized():
-        dist.destroy_process_group()
+        dist.destroy_process_group() 
