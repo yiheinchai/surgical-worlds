@@ -1,29 +1,38 @@
 # Vast.ai training config — optimized for cloud GPU runs
+# Use: python scripts/full_train.py --config configs/vastai_training.yaml
+
 use_wandb: true
 wandb_project: surgical-worlds
+
 dataset: LAPAROSCOPIC
-preload_ratio: 0.1
+preload_ratio: 0.1  # increase to 1.0 once pipeline validated on Vast.ai
+
 patch_size: 4
 context_length: 4
 frame_size: 128
 latent_dim: 6
 num_bins: 4
 n_actions: 8
+
 amp: true
 tf32: true
 compile: true
+
 distributed:
   use_ddp: false
   use_fsdp: false
   reshard_after_forward: false
 nproc_per_node: 1
 standalone: true
+
 video_tokenizer_config: configs/surgical_video_tokenizer.yaml
 latent_actions_config: configs/surgical_latent_actions.yaml
 dynamics_config: configs/surgical_dynamics.yaml
+
 run_video_tokenizer: true
 run_latent_actions: true
 run_dynamics: true
+
 optimizer: "adamw"
 use_moe: false
 fps: 10

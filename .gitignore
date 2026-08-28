@@ -4,3 +4,13 @@ data/
 batch_visualizations/*
 wandb/*
 setup.sh
+inference_results/
+
+# Large files — use scripts/chunk_large_files.py before committing to GitHub
+*.h5
+*.hdf5
+*.mp4
+*.avi
+*.mov
+*.mkv
+data/chunks/
