@@ -13,4 +13,6 @@ inference_results/
 *.avi
 *.mov
 *.mkv
+!docs/screenshots/*.mp4
+!docs/screenshots/*.png
 data/chunks/
