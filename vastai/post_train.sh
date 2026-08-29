@@ -112,17 +112,36 @@ p.write_text(json.dumps(d, indent=2))
 "
 else
   log "WARNING: Could not obtain gradio.live URL after retries."
-  log "Simulator is running locally on port 7860 — use SSH port-forward or local play instructions."
+  log "Trying cloudflared tunnel as fallback..."
+  CF=/tmp/cloudflared
+  if [ ! -x "$CF" ]; then
+    curl -sL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o "$CF" && chmod +x "$CF" || true
+  fi
+  if [ -x "$CF" ]; then
+    nohup "$CF" tunnel --url http://127.0.0.1:7860 > /workspace/cloudflared_tunnel.log 2>&1 &
+    sleep 8
+    URL=$(grep -o 'https://[^ ]*trycloudflare.com' /workspace/cloudflared_tunnel.log 2>/dev/null | head -1 || true)
+    if [ -n "$URL" ]; then
+      log "🎮 PLAY HERE (cloudflared): $URL"
+    fi
+  fi
+  if [ -z "${URL:-}" ]; then
+    log "Simulator is running locally on port 7860 — use SSH port-forward or local play instructions."
+  fi
   python3 -c "
 import json, os
 from pathlib import Path
 p = Path('/workspace/TRAINING_STATUS.json')
 d = json.loads(p.read_text()) if p.exists() else {}
 d['simulator_local'] = 'http://0.0.0.0:7860'
-d['status'] = 'ready_no_public_url'
+d['status'] = 'ready_no_public_url' if not '${URL:-}' else 'ready'
 d['phase'] = 'ready'
 d['run_root'] = os.environ.get('NG_RUN_ROOT_DIR', '')
-d['simulator_note'] = 'gradio.live tunnel unavailable — use local play or SSH port-forward'
+if '${URL:-}':
+    d['simulator_url'] = '${URL:-}'
+    d['simulator_tunnel'] = 'cloudflared'
+else:
+    d['simulator_note'] = 'gradio.live tunnel unavailable — use local play or SSH port-forward'
 p.write_text(json.dumps(d, indent=2))
 "
 fi
