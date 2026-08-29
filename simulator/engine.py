@@ -48,11 +48,14 @@ class StepResult:
     step_index: int
     latency_ms: float
     session_frames: int
+    ground_truth_frame: Optional[Image.Image] = None
 
 
 @dataclass
 class SessionState:
     context_frames: torch.Tensor  # [1, T_ctx, C, H, W]
+    ground_truth_frames: Optional[torch.Tensor] = None  # [1, T_full, C, H, W]
+    seed_index: int = 0
     action_history: List[int] = field(default_factory=list)
     step_count: int = 0
     all_frames: List[Image.Image] = field(default_factory=list)
@@ -110,21 +113,26 @@ class SurgeryWorldEngine:
         if self.config.preload_ratio is not None:
             overrides["preload_ratio"] = self.config.preload_ratio
 
+        # Load extra frames so we can show ground-truth continuation for comparison.
+        frames_to_load = self.config.context_window + 16
         _, _, data_loader, _, _ = load_data_and_data_loaders(
             dataset=self.config.dataset,
             batch_size=1,
-            num_frames=self.config.context_window,
+            num_frames=frames_to_load,
             **overrides,
         )
 
         idx = seed_index if seed_index is not None else random.randint(0, len(data_loader.dataset) - 1)
-        frames = data_loader.dataset[idx][0].unsqueeze(0).to(self.config.device)
+        full_sequence = data_loader.dataset[idx][0].unsqueeze(0).to(self.config.device)
+        context = full_sequence[:, : self.config.context_window]
 
         self.session = SessionState(
-            context_frames=frames,
+            context_frames=context,
+            ground_truth_frames=full_sequence,
+            seed_index=idx,
             action_history=[],
             step_count=0,
-            all_frames=tensor_sequence_to_pil_list(frames),
+            all_frames=tensor_sequence_to_pil_list(context, upscale=True),
         )
         return self.session.all_frames[-1]
 
@@ -192,9 +200,17 @@ class SurgeryWorldEngine:
             [self.session.context_frames, new_frame], dim=1
         )[:, -self.config.context_window :]
 
-        pil_frame = tensor_frame_to_pil(new_frame[0, -1])
+        pil_frame = tensor_frame_to_pil(new_frame[0, -1], upscale=True)
         self.session.all_frames.append(pil_frame)
         self.session.step_count += 1
+
+        gt_frame = None
+        if self.session.ground_truth_frames is not None:
+            gt_idx = self.config.context_window + self.session.step_count - 1
+            if gt_idx < self.session.ground_truth_frames.shape[1]:
+                gt_frame = tensor_frame_to_pil(
+                    self.session.ground_truth_frames[0, gt_idx], upscale=True
+                )
 
         latency_ms = (time.perf_counter() - t0) * 1000
         return StepResult(
@@ -203,6 +219,7 @@ class SurgeryWorldEngine:
             step_index=self.session.step_count,
             latency_ms=latency_ms,
             session_frames=len(self.session.all_frames),
+            ground_truth_frame=gt_frame,
         )
 
     def get_session_gif_frames(self) -> List[Image.Image]:

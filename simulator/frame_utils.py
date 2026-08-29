@@ -7,21 +7,27 @@ import torch
 from PIL import Image
 
 
-def tensor_frame_to_pil(frame: torch.Tensor) -> Image.Image:
+DISPLAY_SIZE = 512
+
+
+def tensor_frame_to_pil(frame: torch.Tensor, upscale: bool = False) -> Image.Image:
     """Convert a single normalized frame [C,H,W] in [-1,1] to PIL RGB."""
     if frame.dim() == 4:
         frame = frame[0]
     img = frame.detach().cpu().float()
     img = ((img + 1) / 2).clamp(0, 1)
     arr = (img.permute(1, 2, 0).numpy() * 255).astype(np.uint8)
-    return Image.fromarray(arr)
+    pil = Image.fromarray(arr)
+    if upscale and max(pil.size) < DISPLAY_SIZE:
+        pil = pil.resize((DISPLAY_SIZE, DISPLAY_SIZE), Image.Resampling.LANCZOS)
+    return pil
 
 
-def tensor_sequence_to_pil_list(frames: torch.Tensor) -> list[Image.Image]:
+def tensor_sequence_to_pil_list(frames: torch.Tensor, upscale: bool = False) -> list[Image.Image]:
     """Convert [T,C,H,W] or [1,T,C,H,W] batch to list of PIL images."""
     if frames.dim() == 5:
         frames = frames[0]
-    return [tensor_frame_to_pil(frames[t]) for t in range(frames.shape[0])]
+    return [tensor_frame_to_pil(frames[t], upscale=upscale) for t in range(frames.shape[0])]
 
 
 def pil_to_model_tensor(image: Image.Image, size: int = 128) -> torch.Tensor:

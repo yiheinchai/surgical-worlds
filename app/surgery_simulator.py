@@ -83,11 +83,11 @@ def _init_engine(
     return status, frame
 
 
-def _do_step(action_id: int) -> Tuple[Image.Image, str, str]:
+def _do_step(action_id: int) -> Tuple[Image.Image, Optional[Image.Image], str, str]:
     global _last_latency
     if _engine is None:
         frame = Image.new("RGB", (512, 512), (20, 10, 10))
-        return frame, "Press **New Procedure** to start.", ""
+        return frame, None, "Press **New Procedure** to start.", ""
 
     result = _engine.step(action_id)
     _last_latency = result.latency_ms
@@ -97,13 +97,13 @@ def _do_step(action_id: int) -> Tuple[Image.Image, str, str]:
         f"{result.latency_ms:.0f} ms · {result.session_frames} frames"
     )
     mode_label = "🧠 World Model" if _mode == "model" else "🎮 Demo"
-    return result.frame, stats, mode_label
+    return result.frame, result.ground_truth_frame, stats, mode_label
 
 
 def _make_action_handler(action_id: int):
     def handler():
-        img, stats, _ = _do_step(action_id)
-        return img, stats
+        img, gt, stats, _ = _do_step(action_id)
+        return img, gt, stats
     return handler
 
 
@@ -132,6 +132,7 @@ def build_ui() -> gr.Blocks:
         theme=gr.themes.Soft(primary_hue="red", neutral_hue="slate"),
         css="""
         .viewport { border: 3px solid #8b1a1a; border-radius: 12px; }
+        .viewport-gt { border: 3px solid #1a6b1a; border-radius: 12px; }
         .control-btn { min-width: 100px !important; font-size: 1.05em !important; }
         .status-box { font-family: monospace; }
         """,
@@ -149,13 +150,25 @@ def build_ui() -> gr.Blocks:
 
         with gr.Row():
             with gr.Column(scale=3):
-                viewport = gr.Image(
-                    label="Laparoscopic Viewport",
-                    type="pil",
-                    height=520,
-                    elem_classes=["viewport"],
-                    show_label=True,
+                gr.Markdown(
+                    "**Compare:** left = original training video frame · right = world model prediction "
+                    "(128×128 native resolution, upscaled for display)"
                 )
+                with gr.Row():
+                    gt_viewport = gr.Image(
+                        label="Original (training video)",
+                        type="pil",
+                        height=400,
+                        elem_classes=["viewport-gt"],
+                        show_label=True,
+                    )
+                    viewport = gr.Image(
+                        label="World model prediction",
+                        type="pil",
+                        height=400,
+                        elem_classes=["viewport"],
+                        show_label=True,
+                    )
                 stats = gr.Markdown("Press **New Procedure** to begin your simulation.", elem_classes=["status-box"])
 
             with gr.Column(scale=2):
@@ -216,29 +229,33 @@ def build_ui() -> gr.Blocks:
 
         def step_lap(action_name):
             s = get_control_scheme("laparoscopic")
-            return _do_step(s.action_id(action_name))[:2]
+            img, gt, stats, _ = _do_step(s.action_id(action_name))
+            return img, gt, stats
 
         def step_rob(action_name):
             s = get_control_scheme("robotic")
-            return _do_step(s.action_id(action_name))[:2]
+            img, gt, stats, _ = _do_step(s.action_id(action_name))
+            return img, gt, stats
 
         def on_new_proc(stype, model, dev, temp):
-            return _init_engine(stype, model, dev, temp)
+            status, frame = _init_engine(stype, model, dev, temp)
+            gt = frame if _mode == "model" else None
+            return status, frame, gt
 
         new_proc.click(
             on_new_proc,
             inputs=[surgery_type, use_model, device, temperature],
-            outputs=[status_box, viewport],
+            outputs=[status_box, viewport, gt_viewport],
         ).then(lambda: "Simulation started. Use instrument controls.", outputs=[stats])
 
-        btn_idle.click(lambda: step_lap("idle"), outputs=[viewport, stats])
-        btn_grasp.click(lambda: step_lap("grasp"), outputs=[viewport, stats])
-        btn_release.click(lambda: step_lap("release"), outputs=[viewport, stats])
-        btn_left.click(lambda: step_lap("left"), outputs=[viewport, stats])
-        btn_right.click(lambda: step_lap("right"), outputs=[viewport, stats])
-        btn_up.click(lambda: step_lap("up"), outputs=[viewport, stats])
-        btn_down.click(lambda: step_lap("down"), outputs=[viewport, stats])
-        btn_camera.click(lambda: step_lap("camera"), outputs=[viewport, stats])
+        btn_idle.click(lambda: step_lap("idle"), outputs=[viewport, gt_viewport, stats])
+        btn_grasp.click(lambda: step_lap("grasp"), outputs=[viewport, gt_viewport, stats])
+        btn_release.click(lambda: step_lap("release"), outputs=[viewport, gt_viewport, stats])
+        btn_left.click(lambda: step_lap("left"), outputs=[viewport, gt_viewport, stats])
+        btn_right.click(lambda: step_lap("right"), outputs=[viewport, gt_viewport, stats])
+        btn_up.click(lambda: step_lap("up"), outputs=[viewport, gt_viewport, stats])
+        btn_down.click(lambda: step_lap("down"), outputs=[viewport, gt_viewport, stats])
+        btn_camera.click(lambda: step_lap("camera"), outputs=[viewport, gt_viewport, stats])
 
         surgery_type.change(
             lambda st: get_control_scheme(st).help_text(),
@@ -251,7 +268,7 @@ def build_ui() -> gr.Blocks:
         demo.load(
             on_new_proc,
             inputs=[surgery_type, use_model, device, temperature],
-            outputs=[status_box, viewport],
+            outputs=[status_box, viewport, gt_viewport],
         )
 
         gr.Markdown(
