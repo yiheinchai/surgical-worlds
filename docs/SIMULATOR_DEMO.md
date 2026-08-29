@@ -36,6 +36,17 @@ Second step — model continues predicting laparoscopic frames from action token
 
 [Download demo video](screenshots/surgery_simulator_world_model_demo.mp4) (MP4, ~5 MB)
 
+## Original vs world model reconstruction
+
+Training saves side-by-side comparisons during dynamics training. At step 11500:
+
+![Original vs reconstruction](screenshots/original_vs_reconstruction_step_11500.png)
+
+- **Left:** masked input frames from the training clip (what the model sees)
+- **Right:** model reconstruction / prediction
+
+The interactive simulator now shows **Original (training video)** vs **World model prediction** side by side when you enable the trained model.
+
 ## Notes
 
 - Inference was tested on **CPU** (~17–18 s per action). Use **CUDA** on a GPU machine for faster playback.
