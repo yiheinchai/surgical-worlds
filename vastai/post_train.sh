@@ -75,16 +75,34 @@ SIM_PID=$!
 echo "$SIM_PID" > /workspace/simulator.pid
 log "Simulator PID: $SIM_PID"
 
-# Wait for Gradio public URL in logs (up to 120s)
-for i in $(seq 1 60); do
+# Wait for Gradio public URL (retry up to ~15 min — gradio.live tunnel can be flaky)
+URL=""
+for attempt in $(seq 1 30); do
   if grep -q "https://.*gradio.live" /workspace/simulator.log 2>/dev/null; then
     URL=$(grep -o 'https://[^ ]*gradio.live' /workspace/simulator.log | head -1)
-    log "🎮 PLAY HERE: $URL"
-    python3 -c "
+    break
+  fi
+  if grep -q "Could not create share link" /workspace/simulator.log 2>/dev/null; then
+    log "Gradio share failed (attempt $attempt/30) — restarting simulator..."
+    kill "$(cat /workspace/simulator.pid 2>/dev/null)" 2>/dev/null || true
+    sleep 5
+    nohup env NG_RUN_ROOT_DIR="${NG_RUN_ROOT_DIR:-}" PYTHONPATH="$WORK_DIR:${PYTHONPATH:-}" \
+      python3 app/surgery_simulator.py --host 0.0.0.0 --port 7860 --share \
+      >> /workspace/simulator.log 2>&1 &
+    echo $! > /workspace/simulator.pid
+    sleep 30
+  else
+    sleep 2
+  fi
+done
+
+if [ -n "$URL" ]; then
+  log "🎮 PLAY HERE: $URL"
+  python3 -c "
 import json, os
 from pathlib import Path
 p = Path('/workspace/TRAINING_STATUS.json')
-d = json.loads(p.read_text())
+d = json.loads(p.read_text()) if p.exists() else {}
 d['simulator_url'] = '$URL'
 d['simulator_local'] = 'http://0.0.0.0:7860'
 d['status'] = 'ready'
@@ -92,10 +110,22 @@ d['phase'] = 'ready'
 d['run_root'] = os.environ.get('NG_RUN_ROOT_DIR', '')
 p.write_text(json.dumps(d, indent=2))
 "
-    break
-  fi
-  sleep 2
-done
+else
+  log "WARNING: Could not obtain gradio.live URL after retries."
+  log "Simulator is running locally on port 7860 — use SSH port-forward or local play instructions."
+  python3 -c "
+import json, os
+from pathlib import Path
+p = Path('/workspace/TRAINING_STATUS.json')
+d = json.loads(p.read_text()) if p.exists() else {}
+d['simulator_local'] = 'http://0.0.0.0:7860'
+d['status'] = 'ready_no_public_url'
+d['phase'] = 'ready'
+d['run_root'] = os.environ.get('NG_RUN_ROOT_DIR', '')
+d['simulator_note'] = 'gradio.live tunnel unavailable — use local play or SSH port-forward'
+p.write_text(json.dumps(d, indent=2))
+"
+fi
 
 log "=== Ready for interaction ==="
 log "Local:  http://<instance-ip>:7860"
