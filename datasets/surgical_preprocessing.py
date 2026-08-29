@@ -33,6 +33,17 @@ def crop_black_borders(
     return frame[y0:y1, x0:x1]
 
 
+def center_crop_square(frame: np.ndarray) -> np.ndarray:
+    """Crop to a centered square so downstream resize does not squash circles into ovals."""
+    h, w = frame.shape[:2]
+    size = min(h, w)
+    if h == w:
+        return frame
+    y0 = (h - size) // 2
+    x0 = (w - size) // 2
+    return frame[y0 : y0 + size, x0 : x0 + size]
+
+
 def apply_circular_mask(frame: np.ndarray, fill_value: int = 0) -> np.ndarray:
     """Mask pixels outside the endoscopic circular viewport."""
     h, w = frame.shape[:2]
@@ -66,6 +77,11 @@ def preprocess_surgical_frame(
     frame = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
     if crop_borders:
         frame = crop_black_borders(frame)
+    out_w, out_h = resize_to
+    if out_w == out_h:
+        # Widescreen laparoscopic feeds (e.g. 848x480) must be square before resize,
+        # otherwise a true circular mask becomes an oval in the final tensor.
+        frame = center_crop_square(frame)
     if circular_mask:
         frame = apply_circular_mask(frame)
     if color_normalize:
