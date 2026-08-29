@@ -145,14 +145,13 @@ def main():
   
         # save model and visualize results
         if i % args.log_interval == 0:
-            if args.use_wandb:
-                with torch.no_grad():
-                    actions = unwrap_model(model).encoder(x)
-                    actions_quantized = unwrap_model(model).quantizer(actions)
-                    idx = unwrap_model(model).quantizer.get_indices_from_latents(actions_quantized)
-                    codebook_usage = idx.unique().numel() / unwrap_model(model).quantizer.codebook_size
-                    z_e_var = actions.var(dim=0, unbiased=False).mean().item()
-                    pred_frames_var = pred_frames.var(dim=0, unbiased=False).mean().item()
+            with torch.no_grad():
+                actions = unwrap_model(model).encoder(x)
+                actions_quantized = unwrap_model(model).quantizer(actions)
+                idx = unwrap_model(model).quantizer.get_indices_from_latents(actions_quantized)
+                codebook_usage = idx.unique().numel() / unwrap_model(model).quantizer.codebook_size
+                z_e_var = actions.var(dim=0, unbiased=False).mean().item()
+                pred_frames_var = pred_frames.var(dim=0, unbiased=False).mean().item()
 
             if args.use_wandb and is_main:
                 wandb.log({
@@ -167,16 +166,12 @@ def main():
             if is_main:
                 save_path = os.path.join(visualizations_dir, f'reconstructions_latent_actions_step_{i}.png')
                 visualize_reconstruction(x, pred_frames, save_path)
-
-                if args.use_wandb:
-                    print(
-                        '\n Step', i, 'Loss:', loss.item(),
-                        'Codebook Usage:', codebook_usage,
-                        'Encoder Variance:', z_e_var,
-                        'Decoder Variance:', pred_frames_var,
-                    )
-                else:
-                    print('\n Step', i, 'Loss:', loss.item())
+                print(
+                    '\n Step', i, 'Loss:', loss.item(),
+                    'Codebook Usage:', codebook_usage,
+                    'Encoder Variance:', z_e_var,
+                    'Decoder Variance:', pred_frames_var,
+                )
 
     # finish wandb
     if args.use_wandb and is_main:
