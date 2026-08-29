@@ -45,10 +45,10 @@ STATUS_SCRIPT="$REPO_DIR/vastai/write_status.sh"
 write_status setup step=pip_install
 pip install -q --upgrade pip && pip install -q -r requirements.txt
 pip install -q torch torchvision --upgrade 2>/dev/null || true
-if [ ! -f "data/surgical/train_laparoscopic_frames.h5" ]; then
+if [ ! -f "data/surgical/train_laparoscopic_frames.h5" ] && [ ! -f "data/surgical/train_robotic_frames.h5" ]; then
   DATA_SOURCE="${DATA_SOURCE:-demo}"
   write_status downloading source="$DATA_SOURCE"
-  if ! python3 scripts/download_surgical_data.py --source "$DATA_SOURCE" ${DATA_DOWNLOAD_URL:+--url "$DATA_DOWNLOAD_URL"} ${HF_DATASET_REPO:+--hf-repo "$HF_DATASET_REPO"} --surgery-type "${SURGERY_TYPE:-laparoscopic}" --max-videos "${MAX_VIDEOS:-10}" --read-step "${READ_STEP:-2}"; then
+  if ! python3 scripts/download_surgical_data.py --source "$DATA_SOURCE" ${DATA_DOWNLOAD_URL:+--url "$DATA_DOWNLOAD_URL"} ${HF_DATASET_REPO:+--hf-repo "$HF_DATASET_REPO"} ${HF_PATTERN:+--hf-pattern "$HF_PATTERN"} --surgery-type "${SURGERY_TYPE:-laparoscopic}" --max-videos "${MAX_VIDEOS:-10}" --read-step "${READ_STEP:-2}"; then
     write_status downloading source=demo_fallback
     python3 scripts/download_surgical_data.py --source demo --surgery-type "${SURGERY_TYPE:-laparoscopic}" --read-step "${READ_STEP:-2}"
   fi

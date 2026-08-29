@@ -26,13 +26,19 @@ def main():
     run_root, run_name = prepare_pipeline_run_root(base_cwd=os.getcwd())
     os.environ['NG_RUN_ROOT_DIR'] = run_root
 
+    try:
+        sep_idx = argv.index('--')
+        stage_overrides = argv[sep_idx + 1:]
+    except ValueError:
+        stage_overrides = []
+
     if train_config.run_video_tokenizer:
-        v_cmd = launcher + ["scripts/train_video_tokenizer.py", "--config", train_config.video_tokenizer_config, "--training_config", training_cfg_path]
+        v_cmd = launcher + ["scripts/train_video_tokenizer.py", "--config", train_config.video_tokenizer_config, "--training_config", training_cfg_path] + stage_overrides
         if not run_command(v_cmd, "Video Tokenizer Training"):
             sys.exit(1)
 
     if train_config.run_latent_actions:
-        latent_actions_cmd = launcher + ["scripts/train_latent_actions.py", "--config", train_config.latent_actions_config, "--training_config", training_cfg_path]
+        latent_actions_cmd = launcher + ["scripts/train_latent_actions.py", "--config", train_config.latent_actions_config, "--training_config", training_cfg_path] + stage_overrides
         if not run_command(latent_actions_cmd, "Latent Actions Training"):
             sys.exit(1)
 
@@ -40,7 +46,7 @@ def main():
     latent_actions_checkpoint = find_latest_checkpoint(".", "latent_actions")
 
     if train_config.run_dynamics:
-        dyn_cmd = launcher + ["scripts/train_dynamics.py", "--config", train_config.dynamics_config, "--training_config", training_cfg_path, f"video_tokenizer_path={video_tokenizer_checkpoint}", f"latent_actions_path={latent_actions_checkpoint}"]
+        dyn_cmd = launcher + ["scripts/train_dynamics.py", "--config", train_config.dynamics_config, "--training_config", training_cfg_path, f"video_tokenizer_path={video_tokenizer_checkpoint}", f"latent_actions_path={latent_actions_checkpoint}"] + stage_overrides
         if not run_command(dyn_cmd, "Dynamics Model Training"):
             sys.exit(1)
 
