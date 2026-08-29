@@ -220,7 +220,7 @@ def main():
 
         # save model and visualize results
         if i % args.log_interval == 0:
-            if args.use_wandb:
+            if is_main:
                 predicted_next_indices = torch.argmax(predicted_next_logits, dim=-1)
                 predicted_next_latents = video_tokenizer.quantizer.get_latents_from_indices(predicted_next_indices, dim=-1)
                 with torch.no_grad():
@@ -259,7 +259,7 @@ def main():
                 save_path = os.path.join(visualizations_dir, f'dynamics_prediction_step_{i}.png')
                 visualize_reconstruction(masked_frames[:16].cpu(), predicted_frames[:16].cpu(), save_path)
 
-            print('\n Step', i, 'Loss:', torch.mean(torch.stack(results["loss_vals"][-args.log_interval:])).item())
+                print('\n Step', i, 'Loss:', torch.mean(torch.stack(results["loss_vals"][-args.log_interval:])).item())
 
     # finish wandb
     if args.use_wandb and is_main:
