@@ -1,4 +1,5 @@
 from models.recon_losses import reconstruction_loss
+from models.utils import ModelType
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
