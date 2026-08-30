@@ -226,16 +226,20 @@ def find_video_root(path: Path) -> Path:
     return best
 
 
-def prepare_data(video_source: Path, surgery_type: str, read_step: int) -> None:
+def prepare_data(video_source: Path, surgery_type: str, read_step: int, force: bool = False) -> None:
     """Run prepare_surgical_data.py on downloaded videos."""
     repo_root = Path(__file__).resolve().parents[1]
-    _run([
+    cmd = [
         sys.executable,
         str(repo_root / "scripts" / "prepare_surgical_data.py"),
         "--input", str(video_source),
         "--surgery-type", surgery_type,
         "--read-step", str(read_step),
-    ])
+        "--resolution", "128", "128",
+    ]
+    if force:
+        cmd.append("--force")
+    _run(cmd)
 
 
 def main() -> None:
@@ -251,10 +255,13 @@ def main() -> None:
     parser.add_argument("--hf-token", default=os.environ.get("HF_TOKEN"))
     parser.add_argument("--output-dir", default="data/surgical/downloads")
     parser.add_argument("--surgery-type", default=os.environ.get("SURGERY_TYPE", "laparoscopic"))
-    parser.add_argument("--max-videos", type=int, default=int(os.environ.get("MAX_VIDEOS", "10")))
-    parser.add_argument("--read-step", type=int, default=int(os.environ.get("READ_STEP", "2")))
+    parser.add_argument("--max-videos", type=int, default=int(os.environ.get("MAX_VIDEOS", "0")),
+                        help="0 = download all available videos")
+    parser.add_argument("--read-step", type=int, default=int(os.environ.get("READ_STEP", "5")))
+    parser.add_argument("--force-prepare", action="store_true", help="Rebuild HDF5 caches")
     parser.add_argument("--skip-prepare", action="store_true")
     args = parser.parse_args()
+    max_videos = None if args.max_videos == 0 else args.max_videos
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -272,16 +279,16 @@ def main() -> None:
         video_source = download_huggingface(
             args.hf_repo, output_dir,
             token=args.hf_token,
-            max_videos=args.max_videos,
+            max_videos=max_videos,
             pattern=args.hf_pattern,
         )
     else:
         raise ValueError(f"Unknown source: {args.source}")
 
     if not args.skip_prepare:
-        prepare_data(video_source, args.surgery_type, args.read_step)
+        prepare_data(video_source, args.surgery_type, args.read_step, force=args.force_prepare)
 
-    print(f"\nDone. Data ready for training (dataset=LAPAROSCOPIC).")
+    print(f"\nDone. Data ready for training (dataset=ROBOTIC_LAPAROSCOPIC for robotic).")
     print(f"Video source: {video_source}")
 
 

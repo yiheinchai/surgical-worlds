@@ -1,4 +1,4 @@
-from models.utils import ModelType
+from models.recon_losses import reconstruction_loss
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -90,7 +90,7 @@ class VideoTokenizer(nn.Module):
         embeddings = self.encoder(frames)  # [B, T, P, L]
         quantized_z = self.quantizer(embeddings)
         x_hat = self.decoder(quantized_z)  # [B, T, C, H, W]
-        recon_loss = F.smooth_l1_loss(x_hat, frames)
+        recon_loss = reconstruction_loss(x_hat, frames)
         return recon_loss, x_hat
 
     def tokenize(self, frames):

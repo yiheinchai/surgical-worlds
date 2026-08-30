@@ -1,0 +1,18 @@
+# Stage 3 — dynamics (interactive world model)
+batch_size_per_gpu: 64
+gradient_accumulation_steps: 2
+n_updates: 30000
+learning_rate: 0.005
+log_interval: 1000
+
+use_actions: true
+
+embed_dim: 64
+num_heads: 8
+hidden_dim: 256
+num_blocks: 10
+
+video_tokenizer_path:
+latent_actions_path:
+
+checkpoint:

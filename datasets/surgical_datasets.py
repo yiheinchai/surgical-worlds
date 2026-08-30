@@ -170,6 +170,7 @@ class SurgicalMultiVideoDataset(Dataset):
                 meta.attrs["surgery_type"] = self.surgery_type
                 meta.attrs["resize_to"] = json.dumps(list(self.resize_to))
                 meta.attrs["num_videos"] = len(selected_videos)
+                meta.attrs["preprocessing_version"] = "center_crop_square_v1"
 
         return stacked, np.array(frame_to_video, dtype=np.int32)
 
