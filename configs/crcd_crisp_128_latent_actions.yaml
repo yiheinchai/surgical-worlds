@@ -1,6 +1,6 @@
 # Stage 2 — latent actions
-batch_size_per_gpu: 48
-gradient_accumulation_steps: 2
+batch_size_per_gpu: 4
+gradient_accumulation_steps: 24
 n_updates: 8000
 learning_rate: 0.0001
 log_interval: 1000
