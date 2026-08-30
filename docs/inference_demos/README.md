@@ -8,6 +8,7 @@ Side-by-side world model inference on **CRCD-dVRK-LeRobot** (RTX 3090, ~1s/step)
 | [crcd_dual_grasp_sweep.mp4](crcd_dual_grasp_sweep.mp4) | Dual grasp sweep (18 steps) |
 | [crcd_cautery_pass.mp4](crcd_cautery_pass.mp4) | Cautery + retract + camera (18 steps) |
 | [crcd_camera_orbit.mp4](crcd_camera_orbit.mp4) | Camera orbit pattern (18 steps) |
+| [crcd_left_then_right.mp4](crcd_left_then_right.mp4) | Tool left ×8, then right ×8 (16 steps) |
 
 **Layout:** left = ground truth CRCD frame, right = world model prediction.
 

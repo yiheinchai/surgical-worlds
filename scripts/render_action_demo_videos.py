@@ -19,12 +19,15 @@ sys.path.insert(0, str(ROOT))
 from simulator.engine import EngineConfig, SurgeryWorldEngine
 
 IDLE, L_GRASP, L_RELEASE, R_GRASP, R_RELEASE, RETRACT, CAMERA, CAUTERY = range(8)
+# Laparoscopic screen-plane motion (indices 3=left, 4=right in latent action codebook)
+L_LEFT, L_RIGHT = 3, 4
 
 ACTION_SEQUENCES: Dict[str, List[int]] = {
     "circle_instruments": [L_GRASP, RETRACT, R_GRASP, RETRACT, CAMERA, RETRACT] * 4,
     "dual_grasp_sweep": [L_GRASP, L_GRASP, R_GRASP, R_GRASP, RETRACT, RETRACT] * 3,
     "cautery_pass": [CAUTERY, CAUTERY, RETRACT, CAMERA, CAUTERY, RETRACT] * 3,
     "camera_orbit": [CAMERA, RETRACT, CAMERA, L_GRASP, CAMERA, R_GRASP] * 3,
+    "left_then_right": [L_LEFT] * 8 + [L_RIGHT] * 8,
 }
 
 
@@ -45,8 +48,19 @@ def _annotate(frame_bgr: np.ndarray, title: str, action_id: int, step: int) -> n
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
     except OSError:
         font = ImageFont.load_default()
-    draw.text((8, 8), f"{title}  |  step {step}  |  action {action_id}", fill=(255, 220, 180), font=font)
+    draw.text((8, 8), f"{title}  |  step {step}  |  action {action_id}{_action_label(action_id)}", fill=(255, 220, 180), font=font)
     return cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
+
+
+_ACTION_NAMES = {
+    0: "hold", 1: "grasp/L-grasp", 2: "release/L-rel", 3: "left", 4: "right",
+    5: "retract/down", 6: "camera", 7: "cautery/up",
+}
+
+
+def _action_label(action_id: int) -> str:
+    name = _ACTION_NAMES.get(action_id)
+    return f" ({name})" if name else ""
 
 
 def _panel_size(height: int = 384, aspect_width_scale: float = 1.0) -> Tuple[int, int]:
