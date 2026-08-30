@@ -1,0 +1,84 @@
+{
+  "baseline": {
+    "frame_size": 128,
+    "patch_size": 4,
+    "measured_inference_ms_per_step": 319.0,
+    "measured_train_hours_3stage": 7.0,
+    "gpu": "RTX 3090"
+  },
+  "note": "Visuals are downscaled CRCD ground-truth frames \u2014 what the model would need to reproduce at each native resolution. Costs scale ~quadratically with edge length.",
+  "resolutions": [
+    {
+      "native_resolution": 64,
+      "patches_per_frame": 256,
+      "patch_multiplier_vs_128": 0.25,
+      "estimated_inference_ms": 230.0,
+      "estimated_full_train_hours_rtx3090": 5.0,
+      "estimated_vram_gb": 0.2,
+      "fits_rtx3090_24gb": true,
+      "benchmark_dynamics_ms": 139.4,
+      "benchmark_relative": 0.72,
+      "notes": null
+    },
+    {
+      "native_resolution": 128,
+      "patches_per_frame": 1024,
+      "patch_multiplier_vs_128": 1.0,
+      "estimated_inference_ms": 319.0,
+      "estimated_full_train_hours_rtx3090": 7.0,
+      "estimated_vram_gb": 0.6,
+      "fits_rtx3090_24gb": true,
+      "benchmark_dynamics_ms": 193.6,
+      "benchmark_relative": 1.0,
+      "notes": null
+    },
+    {
+      "native_resolution": 192,
+      "patches_per_frame": 2304,
+      "patch_multiplier_vs_128": 2.25,
+      "estimated_inference_ms": 1113.0,
+      "estimated_full_train_hours_rtx3090": 24.4,
+      "estimated_vram_gb": 1.4,
+      "fits_rtx3090_24gb": true,
+      "benchmark_dynamics_ms": 675.6,
+      "benchmark_relative": 3.49,
+      "notes": null
+    },
+    {
+      "native_resolution": 256,
+      "patches_per_frame": 4096,
+      "patch_multiplier_vs_128": 4.0,
+      "estimated_inference_ms": 2995.0,
+      "estimated_full_train_hours_rtx3090": 65.7,
+      "estimated_vram_gb": 2.4,
+      "fits_rtx3090_24gb": true,
+      "benchmark_dynamics_ms": 1817.5,
+      "benchmark_relative": 9.39,
+      "notes": null
+    },
+    {
+      "native_resolution": 384,
+      "patches_per_frame": 9216,
+      "patch_multiplier_vs_128": 9.0,
+      "estimated_inference_ms": null,
+      "estimated_full_train_hours_rtx3090": null,
+      "estimated_vram_gb": 5.5,
+      "fits_rtx3090_24gb": false,
+      "benchmark_dynamics_ms": null,
+      "benchmark_relative": null,
+      "notes": "OOM on RTX 3090 dynamics forward"
+    },
+    {
+      "native_resolution": 512,
+      "patches_per_frame": 16384,
+      "patch_multiplier_vs_128": 16.0,
+      "estimated_inference_ms": null,
+      "estimated_full_train_hours_rtx3090": null,
+      "estimated_vram_gb": 9.8,
+      "fits_rtx3090_24gb": false,
+      "benchmark_dynamics_ms": null,
+      "benchmark_relative": null,
+      "notes": "OOM on RTX 3090 dynamics forward"
+    }
+  ]
+}
