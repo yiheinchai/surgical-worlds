@@ -7,7 +7,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -49,15 +49,27 @@ def _annotate(frame_bgr: np.ndarray, title: str, action_id: int, step: int) -> n
     return cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
 
 
+def _panel_size(height: int = 384, aspect_width_scale: float = 1.0) -> Tuple[int, int]:
+    width = max(2, int(round(height * aspect_width_scale)))
+    if width % 2:
+        width += 1
+    if height % 2:
+        height += 1
+    return width, height
+
+
 def render_sequence(
     engine: SurgeryWorldEngine,
     name: str,
     actions: List[int],
     output_path: Path,
-    panel_size: Tuple[int, int] = (384, 384),
+    panel_size: Optional[Tuple[int, int]] = None,
     fps: int = 4,
     seed_index: int = 0,
 ) -> Path:
+    aspect = engine._display_aspect()
+    if panel_size is None:
+        panel_size = _panel_size(384, aspect)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     engine.reset(seed_index=seed_index)
 
@@ -82,17 +94,19 @@ def render_sequence(
     # Re-encode to H.264 — OpenCV mp4v is not playable in GitHub/browser players.
     h264_path = output_path.with_suffix(".h264.mp4")
     import subprocess
-    subprocess.run(
-        [
-            "ffmpeg", "-y", "-i", str(output_path),
-            "-c:v", "libx264", "-pix_fmt", "yuv420p",
-            "-movflags", "+faststart", "-crf", "20",
-            str(h264_path),
-        ],
-        check=True,
-        capture_output=True,
-    )
-    h264_path.replace(output_path)
+    for codec in ("libx264", "libopenh264"):
+        result = subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", str(output_path),
+                "-c:v", codec, "-pix_fmt", "yuv420p",
+                "-movflags", "+faststart", "-crf", "20",
+                str(h264_path),
+            ],
+            capture_output=True,
+        )
+        if result.returncode == 0 and h264_path.exists() and h264_path.stat().st_size > 0:
+            h264_path.replace(output_path)
+            break
 
     print(f"Wrote {output_path} ({len(actions)} inference steps)")
     return output_path

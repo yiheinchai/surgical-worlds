@@ -18,7 +18,7 @@ from einops import repeat
 from PIL import Image
 
 from datasets.data_utils import load_data_and_data_loaders
-from simulator.frame_utils import tensor_frame_to_pil, tensor_sequence_to_pil_list
+from simulator.frame_utils import ROBOTIC_WIDESCREEN_ASPECT, tensor_frame_to_pil, tensor_sequence_to_pil_list
 from utils.inference_utils import load_models
 from utils.utils import find_latest_checkpoint
 
@@ -35,6 +35,7 @@ class EngineConfig:
     compile: bool = False
     dataset: str = "LAPAROSCOPIC"
     preload_ratio: Optional[float] = None
+    display_aspect_width_scale: Optional[float] = None
     video_tokenizer_path: Optional[str] = None
     latent_actions_path: Optional[str] = None
     dynamics_path: Optional[str] = None
@@ -107,6 +108,13 @@ class SurgeryWorldEngine:
         self.latent_action_model.eval()
         self.dynamics_model.eval()
 
+    def _display_aspect(self) -> float:
+        if self.config.display_aspect_width_scale is not None:
+            return self.config.display_aspect_width_scale
+        if self.config.dataset == "ROBOTIC_LAPAROSCOPIC":
+            return ROBOTIC_WIDESCREEN_ASPECT
+        return 1.0
+
     def reset(self, seed_index: Optional[int] = None) -> Image.Image:
         """Start a new simulated procedure from a real surgical context window."""
         overrides = {}
@@ -132,7 +140,9 @@ class SurgeryWorldEngine:
             seed_index=idx,
             action_history=[],
             step_count=0,
-            all_frames=tensor_sequence_to_pil_list(context, upscale=True),
+            all_frames=tensor_sequence_to_pil_list(
+                context, upscale=True, display_aspect_width_scale=self._display_aspect()
+            ),
         )
         return self.session.all_frames[-1]
 
@@ -200,7 +210,9 @@ class SurgeryWorldEngine:
             [self.session.context_frames, new_frame], dim=1
         )[:, -self.config.context_window :]
 
-        pil_frame = tensor_frame_to_pil(new_frame[0, -1], upscale=True)
+        pil_frame = tensor_frame_to_pil(
+            new_frame[0, -1], upscale=True, display_aspect_width_scale=self._display_aspect()
+        )
         self.session.all_frames.append(pil_frame)
         self.session.step_count += 1
 
@@ -209,7 +221,9 @@ class SurgeryWorldEngine:
             gt_idx = self.config.context_window + self.session.step_count - 1
             if gt_idx < self.session.ground_truth_frames.shape[1]:
                 gt_frame = tensor_frame_to_pil(
-                    self.session.ground_truth_frames[0, gt_idx], upscale=True
+                    self.session.ground_truth_frames[0, gt_idx],
+                    upscale=True,
+                    display_aspect_width_scale=self._display_aspect(),
                 )
 
         latency_ms = (time.perf_counter() - t0) * 1000
