@@ -64,14 +64,11 @@ def render_sequence(
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     writer = cv2.VideoWriter(str(output_path), fourcc, fps, (panel_size[0] * 2, panel_size[1] + 36))
 
-    for i, frame in enumerate(engine.get_session_gif_frames()):
-        pred = _annotate(_pil_to_bgr(frame, panel_size), f"{name} — context", IDLE, i)
-        gt_panel = np.zeros_like(pred)
-        cv2.putText(
-            gt_panel, "Ground truth (CRCD)", (20, panel_size[1] // 2),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (180, 255, 180), 2, cv2.LINE_AA,
-        )
-        writer.write(np.hstack([gt_panel, pred]))
+    context_frames = engine.get_session_gif_frames()
+    for i, frame in enumerate(context_frames):
+        gt_bgr = _annotate(_pil_to_bgr(frame, panel_size), f"{name} — context (GT)", IDLE, i)
+        pred_bgr = _annotate(_pil_to_bgr(frame, panel_size), f"{name} — context", IDLE, i)
+        writer.write(np.hstack([gt_bgr, pred_bgr]))
 
     for step, action_id in enumerate(actions, start=1):
         result = engine.step(action_id)
@@ -81,6 +78,22 @@ def render_sequence(
         writer.write(np.hstack([gt_bgr, pred_bgr]))
 
     writer.release()
+
+    # Re-encode to H.264 — OpenCV mp4v is not playable in GitHub/browser players.
+    h264_path = output_path.with_suffix(".h264.mp4")
+    import subprocess
+    subprocess.run(
+        [
+            "ffmpeg", "-y", "-i", str(output_path),
+            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart", "-crf", "20",
+            str(h264_path),
+        ],
+        check=True,
+        capture_output=True,
+    )
+    h264_path.replace(output_path)
+
     print(f"Wrote {output_path} ({len(actions)} inference steps)")
     return output_path
 
