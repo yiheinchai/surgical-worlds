@@ -36,6 +36,7 @@ class EngineConfig:
     dataset: str = "LAPAROSCOPIC"
     preload_ratio: Optional[float] = None
     display_aspect_width_scale: Optional[float] = None
+    display_size: int = 512
     video_tokenizer_path: Optional[str] = None
     latent_actions_path: Optional[str] = None
     dynamics_path: Optional[str] = None
@@ -141,7 +142,10 @@ class SurgeryWorldEngine:
             action_history=[],
             step_count=0,
             all_frames=tensor_sequence_to_pil_list(
-                context, upscale=True, display_aspect_width_scale=self._display_aspect()
+                context,
+                upscale=True,
+                display_aspect_width_scale=self._display_aspect(),
+                display_size=self.config.display_size,
             ),
         )
         return self.session.all_frames[-1]
@@ -211,7 +215,10 @@ class SurgeryWorldEngine:
         )[:, -self.config.context_window :]
 
         pil_frame = tensor_frame_to_pil(
-            new_frame[0, -1], upscale=True, display_aspect_width_scale=self._display_aspect()
+            new_frame[0, -1],
+            upscale=True,
+            display_aspect_width_scale=self._display_aspect(),
+            display_size=self.config.display_size,
         )
         self.session.all_frames.append(pil_frame)
         self.session.step_count += 1
@@ -224,6 +231,7 @@ class SurgeryWorldEngine:
                     self.session.ground_truth_frames[0, gt_idx],
                     upscale=True,
                     display_aspect_width_scale=self._display_aspect(),
+                    display_size=self.config.display_size,
                 )
 
         latency_ms = (time.perf_counter() - t0) * 1000

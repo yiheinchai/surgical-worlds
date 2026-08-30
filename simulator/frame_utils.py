@@ -17,6 +17,7 @@ def tensor_frame_to_pil(
     frame: torch.Tensor,
     upscale: bool = False,
     display_aspect_width_scale: float = 1.0,
+    display_size: int = DISPLAY_SIZE,
 ) -> Image.Image:
     """Convert a single normalized frame [C,H,W] in [-1,1] to PIL RGB."""
     if frame.dim() == 4:
@@ -27,11 +28,11 @@ def tensor_frame_to_pil(
     pil = Image.fromarray(arr)
     if upscale:
         if display_aspect_width_scale != 1.0:
-            target_h = DISPLAY_SIZE
+            target_h = display_size
             target_w = max(1, int(round(target_h * display_aspect_width_scale)))
             pil = pil.resize((target_w, target_h), Image.Resampling.LANCZOS)
-        elif max(pil.size) < DISPLAY_SIZE:
-            pil = pil.resize((DISPLAY_SIZE, DISPLAY_SIZE), Image.Resampling.LANCZOS)
+        elif max(pil.size) < display_size:
+            pil = pil.resize((display_size, display_size), Image.Resampling.LANCZOS)
     return pil
 
 
@@ -39,12 +40,18 @@ def tensor_sequence_to_pil_list(
     frames: torch.Tensor,
     upscale: bool = False,
     display_aspect_width_scale: float = 1.0,
+    display_size: int = DISPLAY_SIZE,
 ) -> list[Image.Image]:
     """Convert [T,C,H,W] or [1,T,C,H,W] batch to list of PIL images."""
     if frames.dim() == 5:
         frames = frames[0]
     return [
-        tensor_frame_to_pil(frames[t], upscale=upscale, display_aspect_width_scale=display_aspect_width_scale)
+        tensor_frame_to_pil(
+            frames[t],
+            upscale=upscale,
+            display_aspect_width_scale=display_aspect_width_scale,
+            display_size=display_size,
+        )
         for t in range(frames.shape[0])
     ]
 
