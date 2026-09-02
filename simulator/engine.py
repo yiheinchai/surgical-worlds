@@ -27,6 +27,7 @@ from utils.utils import find_latest_checkpoint
 class EngineConfig:
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     context_window: int = 4
+    generation_steps: int = 16  # GT frames reserved for rollout comparison
     prediction_horizon: int = 1
     maskgit_steps: int = 8
     temperature: float = 0.4
@@ -123,7 +124,7 @@ class SurgeryWorldEngine:
             overrides["preload_ratio"] = self.config.preload_ratio
 
         # Load extra frames so we can show ground-truth continuation for comparison.
-        frames_to_load = self.config.context_window + 16
+        frames_to_load = self.config.context_window + self.config.generation_steps
         _, _, data_loader, _, _ = load_data_and_data_loaders(
             dataset=self.config.dataset,
             batch_size=1,
