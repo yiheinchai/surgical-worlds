@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # Poll Vast instance until inference sweep finishes, then stop (not destroy).
-set -euo pipefail
+set -eo pipefail
 
 export PATH="$HOME/.local/bin:$PATH"
 INSTANCE_ID="${1:-49067833}"
 POLL_SEC="${POLL_SEC:-180}"
 
-if [ -z "${VASTAI_API_KEY:-}" ] && [ -f "$HOME/.config/vastai/vast_api_key" ]; then
-  export VASTAI_API_KEY="$(cat "$HOME/.config/vastai/vast_api_key)"
+API_KEY_FILE="$HOME/.config/vastai/vast_api_key"
+if [ -z "${VASTAI_API_KEY:-}" ] && [ -f "$API_KEY_FILE" ]; then
+  VASTAI_API_KEY="$(cat "$API_KEY_FILE")"
+  export VASTAI_API_KEY
 fi
-[ -n "${VASTAI_API_KEY:-}" ] || { echo "Set VASTAI_API_KEY"; exit 1; }
+if [ -z "${VASTAI_API_KEY:-}" ]; then
+  echo "Set VASTAI_API_KEY"
+  exit 1
+fi
 
 vastai set api-key "$VASTAI_API_KEY" >/dev/null
 SSH_INFO=$(vastai ssh-url "$INSTANCE_ID" 2>&1)
