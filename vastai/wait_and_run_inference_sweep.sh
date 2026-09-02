@@ -10,8 +10,23 @@ LOG="/workspace/inference_sweep.log"
 SWEEP_OUT="$WORK_DIR/docs/inference_sweep"
 TRAIN_LOG="${TRAIN_LOG:-/workspace/crcd_crisp_train.log}"
 GITHUB_BRANCH="${GITHUB_BRANCH:-cursor/crcd-crisp-128-training-19ae}"
+VAST_INSTANCE_ID="${VAST_INSTANCE_ID:-49067833}"
 
 log() { echo "[$(date -Iseconds)] $*" | tee -a "$LOG"; }
+
+stop_instance_preserve_disk() {
+  local id="${VAST_INSTANCE_ID}"
+  if [ -z "${VASTAI_API_KEY:-}" ]; then
+    log "No VASTAI_API_KEY — skip auto-stop (agent should run stop_instance_after_sweep.sh)"
+    return 0
+  fi
+  log "Stopping instance $id (state=stopped, disk preserved — NOT destroy)..."
+  curl -sS -X PUT "https://console.vast.ai/api/v0/instances/${id}/" \
+    -H "Authorization: Bearer ${VASTAI_API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{"state": "stopped"}' >>"$LOG" 2>&1 || true
+  log "Stop request sent for instance $id"
+}
 
 log "=== Inference sweep watchdog started ==="
 
@@ -153,3 +168,8 @@ else
 fi
 
 log "=== Inference sweep complete ==="
+date -u +%Y-%m-%dT%H:%M:%SZ > /workspace/inference_sweep_complete.txt
+echo "sweep_done" >> /workspace/inference_sweep_complete.txt
+
+# Stop GPU billing; keep instance disk/data (do NOT destroy).
+stop_instance_preserve_disk
