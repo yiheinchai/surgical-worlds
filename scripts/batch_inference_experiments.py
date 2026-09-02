@@ -220,8 +220,9 @@ def build_experiment_grid(default_dyn: int) -> List[Experiment]:
             generation_steps=max(20, len(ACTION_SEQUENCES[seq])),
         ))
 
-    # Context length (trained at 4; try 2 as ablation)
-    for ctx in (2, 4):
+    # Context length — trained at 4; architecture has no fixed T max (sinusoidal PE).
+    # Practical inference cap ~16–32 on RTX 3090 @ 128² before VRAM blows up.
+    for ctx in (2, 3, 4, 6, 8, 12, 16):
         exps.append(Experiment(
             name=f"ctx{ctx}_left_then_right",
             category="by_context",
@@ -230,16 +231,44 @@ def build_experiment_grid(default_dyn: int) -> List[Experiment]:
             context_window=ctx,
             generation_steps=20,
         ))
+        exps.append(Experiment(
+            name=f"ctx{ctx}_right_x12",
+            category="by_context",
+            seed=3,
+            actions=[L_RIGHT] * 12,
+            context_window=ctx,
+            generation_steps=16,
+        ))
 
-    # Prediction horizon
-    for ph in (1, 2):
+    # Prediction horizon — decode H future frames per dynamics call
+    for ph in (1, 2, 3, 4, 6, 8):
         exps.append(Experiment(
             name=f"ph{ph}_left_then_right",
             category="by_horizon",
             seed=3,
             action_sequence="left_then_right",
             prediction_horizon=ph,
+            generation_steps=24,
+        ))
+        exps.append(Experiment(
+            name=f"ph{ph}_right_x12",
+            category="by_horizon",
+            seed=3,
+            actions=[L_RIGHT] * 12,
+            prediction_horizon=ph,
             generation_steps=20,
+        ))
+
+    # Context × horizon interaction (small grid on seed 3)
+    for ctx, ph in ((4, 2), (4, 4), (8, 2), (8, 4), (16, 2)):
+        exps.append(Experiment(
+            name=f"ctx{ctx}_ph{ph}_left_then_right",
+            category="by_ctx_horizon",
+            seed=3,
+            action_sequence="left_then_right",
+            context_window=ctx,
+            prediction_horizon=ph,
+            generation_steps=24,
         ))
 
     # Temperature
