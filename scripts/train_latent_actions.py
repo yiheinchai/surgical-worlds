@@ -10,6 +10,7 @@ from utils.utils import readable_timestamp, save_training_state, prepare_stage_d
 from utils.config import LatentActionsConfig, load_stage_config_merged
 from utils.utils import save_training_state, load_latent_actions_from_checkpoint
 from utils.wandb_utils import init_wandb, log_system_metrics, finish_wandb, log_action_distribution, log_learning_rate
+from utils.eval_utils import mean_loader_loss
 from dataclasses import asdict
 from utils.distributed import init_distributed_from_env, prepare_model_for_distributed, unwrap_model, print_param_count_if_main, cleanup_distributed
 from torch.distributed.fsdp import FSDPModule
@@ -96,13 +97,21 @@ def main():
     # init wandb
     if args.use_wandb and is_main:
         cfg = asdict(args)
-        cfg.update({'timestamp': timestamp})
+        cfg.update({'timestamp': timestamp, 'stage': 'latent_actions'})
         run_name = f"latent_actions_{timestamp}"
-        init_wandb(args.wandb_project, cfg, run_name)
+        init_wandb(
+            args.wandb_project,
+            cfg,
+            run_name,
+            group=os.environ.get('WANDB_RUN_GROUP') or os.path.basename(run_root),
+            job_type='latent_actions',
+            tags=['latent_actions', args.dataset, 'tinyworlds'],
+        )
 
     unwrap_model(model).train()
 
     train_iter = iter(training_loader)
+    val_batches = int(os.environ.get('WANDB_VAL_BATCHES', '4'))
     for i in tqdm(range(args.n_updates), disable=not is_main):
         for opt in optimizers:
             opt.zero_grad(set_to_none=True)
@@ -139,6 +148,7 @@ def main():
         if args.use_wandb and is_main:
             wandb.log({
                 'train/loss': loss.item(),
+                'step': i,
             }, step=i)
             log_system_metrics(i)
             log_learning_rate(optimizers[0], i)
@@ -155,11 +165,22 @@ def main():
 
             if args.use_wandb and is_main:
                 wandb.log({
-                    "latent_actions/codebook_usage": codebook_usage,
-                    "latent_actions/encoder_variance": z_e_var,
-                    "latent_actions/decoder_variance": pred_frames_var,
+                    "train/codebook_usage": codebook_usage,
+                    "train/encoder_variance": z_e_var,
+                    "train/decoder_variance": pred_frames_var,
+                    "step": i,
                 }, step=i)
                 log_action_distribution(idx, i, args.n_actions)
+
+                unwrap_model(model).eval()
+                def _lam_val_step(batch):
+                    with train_ctx:
+                        vloss, _ = unwrap_model(model)(batch)
+                    return vloss
+                val_loss = mean_loader_loss(_lam_val_step, validation_loader, args.device, n_batches=val_batches)
+                unwrap_model(model).train()
+                if val_loss is not None:
+                    wandb.log({'val/loss': val_loss, 'step': i}, step=i)
 
             hyperparameters = vars(args)
             save_training_state(model, optimizers[0], None, hyperparameters, checkpoints_dir, prefix='latent_actions', step=i)

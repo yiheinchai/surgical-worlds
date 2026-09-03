@@ -40,8 +40,9 @@ class DynamicsModel(nn.Module):
         # convert latents to float for embedding
         discrete_latents = discrete_latents.to(dtype=torch.float32)
 
-        # apply MaskGIT random masking during training
-        if training and self.training:
+        # apply MaskGIT random masking when asked to train/eval the MLM objective.
+        # Use `training=True` even under torch.no_grad()/eval() so val/loss matches train.
+        if training:
             # per-batch mask ratio in [0.5, 1.0)
             mask_ratio = 0.5 + torch.rand((), device=discrete_latents.device) * 0.5 
             mask_positions = (torch.rand(B, T, P, device=discrete_latents.device) < mask_ratio) # [B, T, P]
@@ -69,7 +70,7 @@ class DynamicsModel(nn.Module):
 
         # compute masked cross-entropy loss
         loss = None
-        if training and self.training:
+        if training:
             assert targets is not None, "target indices are needed for training"
             Ld = predicted_logits.shape[-1] # L^D
             logits_flat = predicted_logits.reshape(-1, Ld) # [(B*T*P), L^D]
