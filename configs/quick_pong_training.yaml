@@ -1,0 +1,38 @@
+# Pong training using original TinyWorlds hyperparameters
+# VT: 40k steps @ bs=350 | LAM: 10k steps | Dyn: 300k steps @ bs=500, lr=0.01
+
+use_wandb: false
+wandb_project: tinyworlds-pong
+
+dataset: PONG
+preload_ratio: 0.005
+fps: 15
+
+patch_size: 4
+context_length: 4
+frame_size: 64
+latent_dim: 5
+num_bins: 4
+n_actions: 4
+
+amp: true
+tf32: true
+compile: false
+
+distributed:
+  use_ddp: false
+  use_fsdp: false
+  reshard_after_forward: false
+nproc_per_node: 1
+standalone: true
+
+video_tokenizer_config: configs/quick_pong_video_tokenizer.yaml
+latent_actions_config: configs/quick_pong_latent_actions.yaml
+dynamics_config: configs/quick_pong_dynamics.yaml
+
+run_video_tokenizer: true
+run_latent_actions: true
+run_dynamics: true
+
+optimizer: "adamw"
+use_moe: false

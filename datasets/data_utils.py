@@ -268,13 +268,14 @@ def visualize_reconstruction(original, reconstruction, save_path=None):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
 
     orig_flat = original.reshape(-1, *original.shape[2:])
-    grid_orig = make_grid(orig_flat, nrow=seq_length, normalize=True, padding=2).clamp(0, 1)
+    # Use value_range=(-1,1) so [-1,1] tensors are mapped directly to [0,1] — collapse is visible
+    grid_orig = make_grid(orig_flat, nrow=seq_length, normalize=True, value_range=(-1, 1), padding=2).clamp(0, 1)
     ax1.imshow(grid_orig.permute(1, 2, 0).contiguous().numpy())
     ax1.axis('off')
     ax1.set_title(f'Original Sequences (4 sequences x {seq_length} frames)')
 
     recon_flat = reconstruction.reshape(-1, *reconstruction.shape[2:])
-    grid_recon = make_grid(recon_flat, nrow=seq_length, normalize=True, padding=2).clamp(0, 1)
+    grid_recon = make_grid(recon_flat, nrow=seq_length, normalize=True, value_range=(-1, 1), padding=2).clamp(0, 1)
     ax2.imshow(grid_recon.permute(1, 2, 0).contiguous().numpy())
     ax2.axis('off')
     ax2.set_title(f'Reconstructed Sequences (4 sequences x {seq_length} frames)')

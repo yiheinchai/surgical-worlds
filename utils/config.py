@@ -117,7 +117,8 @@ class VideoTokenizerConfig:
 	# other params
 	fps: Optional[int] = None
 	preload_ratio: Optional[float] = None
-	
+	fg_weight: float = 0.0
+
 	def __post_init__(self) -> None:
 		_validate_amp_fsdp(self.amp, self.distributed)
 		_validate_distibuted_training(self.nproc_per_node, self.distributed)
