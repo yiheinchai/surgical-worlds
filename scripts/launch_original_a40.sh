@@ -21,6 +21,9 @@ if [ -z "${VASTAI_API_KEY:-}" ] && [ -f "${HOME}/.config/vastai/vast_api_key" ];
   export VASTAI_API_KEY="$(cat "${HOME}/.config/vastai/vast_api_key")"
 fi
 [ -n "${VASTAI_API_KEY:-}" ] || { echo "Set VASTAI_API_KEY"; exit 1; }
+if [ -z "${WANDB_API_KEY:-}" ] && [ -f "${HOME}/.config/wandb/api_key" ]; then
+  export WANDB_API_KEY="$(cat "${HOME}/.config/wandb/api_key")"
+fi
 [ -n "${WANDB_API_KEY:-}" ] || {
   echo "WANDB_API_KEY is required for monitoring."
   echo "Get one at https://wandb.ai/authorize then: export WANDB_API_KEY=..."
@@ -31,8 +34,8 @@ vastai set api-key "$VASTAI_API_KEY" >/dev/null
 
 OFFER_ID="${1:-}"
 if [ -z "$OFFER_ID" ]; then
-  bash scripts/pick_a40_offer.sh
-  OFFER_ID="$(python3 -c 'import json; print(json.load(open("/tmp/selected_vast_offer.json"))["id"])')"
+  PREFER_GPU="$PREFER_GPU" STRICT_GPU="$STRICT_GPU" bash scripts/pick_a40_offer.sh
+  OFFER_ID="$(python3 -c 'import json; d=json.load(open("/tmp/selected_vast_offer.json")); print(d.get("selected",d)["id"])')"
 fi
 
 IMAGE="${VAST_IMAGE:-pytorch/pytorch:2.4.0-cuda12.4-cudnn9-runtime}"
@@ -41,8 +44,11 @@ DATASET="${DATASET:-PICODOOM}"
 GIT_BRANCH="${GIT_BRANCH:-cursor/a40-original-tinyworlds-wandb-19ae}"
 GIT_REPO="${GIT_REPO:-https://github.com/yiheinchai/surgical-worlds.git}"
 WANDB_PROJECT="${WANDB_PROJECT:-tinyworlds}"
-WANDB_ENTITY="${WANDB_ENTITY:-}"
+WANDB_ENTITY="${WANDB_ENTITY:-data1yihein}"
 RUN_GROUP="original-${DATASET}-$(date -u +%Y%m%d_%H%M%S)"
+# Prefer exact A40 when STRICT_GPU=1; otherwise bottleneck-aware best ≥40GB.
+STRICT_GPU="${STRICT_GPU:-1}"
+PREFER_GPU="${PREFER_GPU:-A40}"
 
 # Dataset file patterns for AlmondGod/tinyworlds HF dataset repo
 case "$DATASET" in
