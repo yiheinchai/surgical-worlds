@@ -7,6 +7,7 @@ import math
 from einops import rearrange, repeat, reduce
 from models.st_transformer import STTransformer, PatchEmbedding
 from models.fsq import FiniteScalarQuantizer
+from models.recon_losses import reconstruction_loss
 
 NUM_LATENT_ACTIONS_BINS = 2
 
@@ -120,7 +121,7 @@ class LatentActionModel(nn.Module):
 
         # reconstruction loss
         target_frames = frames[:, 1:]  # All frames except first [B, T - 1, C, H, W]
-        recon_loss = F.smooth_l1_loss(pred_frames, target_frames)
+        recon_loss = reconstruction_loss(pred_frames, target_frames)
 
         # variance loss across batch dim for pre-quant encoder outputs (helps prevent action collapse)
         z_var = action_latents.var(dim=0, unbiased=False).mean()

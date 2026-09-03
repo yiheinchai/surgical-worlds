@@ -18,7 +18,7 @@ from einops import repeat
 from PIL import Image
 
 from datasets.data_utils import load_data_and_data_loaders
-from simulator.frame_utils import tensor_frame_to_pil, tensor_sequence_to_pil_list
+from simulator.frame_utils import ROBOTIC_WIDESCREEN_ASPECT, tensor_frame_to_pil, tensor_sequence_to_pil_list
 from utils.inference_utils import load_models
 from utils.utils import find_latest_checkpoint
 
@@ -27,6 +27,7 @@ from utils.utils import find_latest_checkpoint
 class EngineConfig:
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     context_window: int = 4
+    generation_steps: int = 16  # GT frames reserved for rollout comparison
     prediction_horizon: int = 1
     maskgit_steps: int = 8
     temperature: float = 0.4
@@ -35,6 +36,8 @@ class EngineConfig:
     compile: bool = False
     dataset: str = "LAPAROSCOPIC"
     preload_ratio: Optional[float] = None
+    display_aspect_width_scale: Optional[float] = None
+    display_size: int = 512
     video_tokenizer_path: Optional[str] = None
     latent_actions_path: Optional[str] = None
     dynamics_path: Optional[str] = None
@@ -107,6 +110,13 @@ class SurgeryWorldEngine:
         self.latent_action_model.eval()
         self.dynamics_model.eval()
 
+    def _display_aspect(self) -> float:
+        if self.config.display_aspect_width_scale is not None:
+            return self.config.display_aspect_width_scale
+        if self.config.dataset == "ROBOTIC_LAPAROSCOPIC":
+            return ROBOTIC_WIDESCREEN_ASPECT
+        return 1.0
+
     def reset(self, seed_index: Optional[int] = None) -> Image.Image:
         """Start a new simulated procedure from a real surgical context window."""
         overrides = {}
@@ -114,7 +124,7 @@ class SurgeryWorldEngine:
             overrides["preload_ratio"] = self.config.preload_ratio
 
         # Load extra frames so we can show ground-truth continuation for comparison.
-        frames_to_load = self.config.context_window + 16
+        frames_to_load = self.config.context_window + self.config.generation_steps
         _, _, data_loader, _, _ = load_data_and_data_loaders(
             dataset=self.config.dataset,
             batch_size=1,
@@ -132,7 +142,12 @@ class SurgeryWorldEngine:
             seed_index=idx,
             action_history=[],
             step_count=0,
-            all_frames=tensor_sequence_to_pil_list(context, upscale=True),
+            all_frames=tensor_sequence_to_pil_list(
+                context,
+                upscale=True,
+                display_aspect_width_scale=self._display_aspect(),
+                display_size=self.config.display_size,
+            ),
         )
         return self.session.all_frames[-1]
 
@@ -200,7 +215,12 @@ class SurgeryWorldEngine:
             [self.session.context_frames, new_frame], dim=1
         )[:, -self.config.context_window :]
 
-        pil_frame = tensor_frame_to_pil(new_frame[0, -1], upscale=True)
+        pil_frame = tensor_frame_to_pil(
+            new_frame[0, -1],
+            upscale=True,
+            display_aspect_width_scale=self._display_aspect(),
+            display_size=self.config.display_size,
+        )
         self.session.all_frames.append(pil_frame)
         self.session.step_count += 1
 
@@ -209,7 +229,10 @@ class SurgeryWorldEngine:
             gt_idx = self.config.context_window + self.session.step_count - 1
             if gt_idx < self.session.ground_truth_frames.shape[1]:
                 gt_frame = tensor_frame_to_pil(
-                    self.session.ground_truth_frames[0, gt_idx], upscale=True
+                    self.session.ground_truth_frames[0, gt_idx],
+                    upscale=True,
+                    display_aspect_width_scale=self._display_aspect(),
+                    display_size=self.config.display_size,
                 )
 
         latency_ms = (time.perf_counter() - t0) * 1000

@@ -15,4 +15,6 @@ inference_results/
 *.mkv
 !docs/screenshots/*.mp4
 !docs/screenshots/*.png
+!docs/inference_demos/*.mp4
+!docs/inference_sweep/**/*.mp4
 data/chunks/

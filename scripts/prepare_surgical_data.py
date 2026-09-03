@@ -42,7 +42,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-ratio", type=float, default=0.9)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--fps", type=int, default=10, help="Target FPS metadata for training configs")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Rebuild .h5 caches even if they already exist (required after preprocessing fixes)",
+    )
     return parser.parse_args()
+
+
+PREPROCESSING_VERSION = "center_crop_square_v1"
 
 
 def main() -> None:
@@ -66,6 +74,9 @@ def main() -> None:
             "fps": args.fps,
             "num_train_videos": len(train_videos),
             "num_val_videos": len(val_videos),
+            "preprocessing_version": PREPROCESSING_VERSION,
+            "center_crop_square": True,
+            "circular_mask_robotic": args.surgery_type == "robotic",
         },
     )
     print(f"Saved manifest with {len(train_videos)} train / {len(val_videos)} val videos → {manifest_path}")
@@ -93,6 +104,9 @@ def main() -> None:
 
     for split_name, train_flag in [("train", True), ("val", False)]:
         h5_path = output_dir / f"{split_name}_{h5_name}"
+        if args.force and h5_path.exists():
+            print(f"Removing stale cache {h5_path}")
+            h5_path.unlink()
         print(f"\nBuilding {split_name} cache → {h5_path}")
         ds = dataset_cls(
             video_path=str(input_path),
@@ -113,7 +127,7 @@ def main() -> None:
     if args.surgery_type == "laparoscopic":
         print("  python scripts/full_train.py --config configs/surgical_training.yaml -- dataset=LAPAROSCOPIC")
     else:
-        print("  python scripts/full_train.py --config configs/surgical_training.yaml -- dataset=ROBOTIC_LAPAROSCOPIC")
+        print("  python scripts/full_train.py --config configs/crcd_crisp_128_training.yaml -- dataset=ROBOTIC_LAPAROSCOPIC")
 
 
 if __name__ == "__main__":

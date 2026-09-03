@@ -1,0 +1,14 @@
+# Stage 1 — video tokenizer (reconstruction quality = ceiling for world model)
+# batch 4 fits RTX 3090 @ 128² patch=4 (1024 patches/frame); grad accum keeps effective batch
+batch_size_per_gpu: 4
+gradient_accumulation_steps: 24
+n_updates: 15000
+learning_rate: 0.001
+log_interval: 1000
+
+embed_dim: 64
+num_heads: 8
+hidden_dim: 256
+num_blocks: 6
+
+checkpoint:

@@ -1,0 +1,38 @@
+# CRCD crisp 128×128 — full dataset, moderate epochs (prefer data over steps)
+# Launch: bash scripts/run_crcd_crisp_training.sh
+
+use_wandb: false
+wandb_project: surgical-worlds
+
+dataset: ROBOTIC_LAPAROSCOPIC
+preload_ratio: 1.0
+
+patch_size: 4
+context_length: 4
+frame_size: 128
+latent_dim: 6
+num_bins: 4
+n_actions: 8
+
+amp: true
+tf32: true
+compile: false
+
+distributed:
+  use_ddp: false
+  use_fsdp: false
+  reshard_after_forward: false
+nproc_per_node: 1
+standalone: true
+
+video_tokenizer_config: configs/crcd_crisp_128_video_tokenizer.yaml
+latent_actions_config: configs/crcd_crisp_128_latent_actions.yaml
+dynamics_config: configs/crcd_crisp_128_dynamics.yaml
+
+run_video_tokenizer: true
+run_latent_actions: true
+run_dynamics: true
+
+optimizer: "adamw"
+use_moe: false
+fps: 10
