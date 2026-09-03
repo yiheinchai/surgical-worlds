@@ -68,13 +68,15 @@ def _to_pil(tensor_frame: torch.Tensor, panel_size: Tuple[int, int], aspect: flo
 
 
 def _encode_h264(src: Path) -> None:
+    """Re-encode OpenCV mp4v output to H.264 for browser/GitHub playback."""
     tmp = src.with_suffix(".h264.mp4")
+    last_err = b""
     for codec in ("libx264", "libopenh264"):
         result = subprocess.run(
             [
                 "ffmpeg", "-y", "-i", str(src),
                 "-c:v", codec, "-pix_fmt", "yuv420p",
-                "-movflags", "+faststart", "-crf", "20",
+                "-movflags", "+faststart", "-crf", "20", "-an",
                 str(tmp),
             ],
             capture_output=True,
@@ -82,6 +84,12 @@ def _encode_h264(src: Path) -> None:
         if result.returncode == 0 and tmp.exists() and tmp.stat().st_size > 0:
             tmp.replace(src)
             return
+        last_err = result.stderr or b""
+        tmp.unlink(missing_ok=True)
+    raise RuntimeError(
+        f"H.264 encode failed for {src} (need ffmpeg libx264). "
+        f"stderr tail: {last_err[-500:]!r}"
+    )
 
 
 def _build_action_latent(

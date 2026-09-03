@@ -28,3 +28,7 @@ Experiments: 69 (54 succeeded, 15 failed)
 - Latest dynamics checkpoint: **dynamics_step_29000** (training interrupted at ~29498/30000).
 
 See `manifest.json` for full experiment metadata.
+
+## Playback note
+
+Videos are **H.264 / yuv420p**. An earlier upload used OpenCV `mp4v` (MPEG-4 Part 2), which many browsers and GitHub's player render as a solid green frame.
