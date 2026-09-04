@@ -21,7 +21,7 @@
 | Git branch | `cursor/a40-original-tinyworlds-wandb-19ae` on `yiheinchai/surgical-worlds` |
 | Handoff doc | `docs/ORIGINAL_PICODOOM_HANDOFF.md` (this file) |
 | Run monitor JSON | `ORIGINAL_TRAIN_MONITOR.json` |
-| Checkpoint release | GitHub Release tag `original-picodoom-20260904` (see repo Releases) |
+| Checkpoint release | https://github.com/yiheinchai/surgical-worlds/releases/tag/original-picodoom-20260904 |
 | Local backup (agent VM) | `/agent/checkpoint-backups/49801668/FINAL/` |
 
 ### Checkpoint layout (after extracting release)
