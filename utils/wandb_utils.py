@@ -2,27 +2,55 @@ import wandb
 import torch
 import os
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
-def init_wandb(project_name: str, config: Dict[str, Any], run_name: Optional[str] = None) -> wandb.run:
+def init_wandb(
+    project_name: str,
+    config: Dict[str, Any],
+    run_name: Optional[str] = None,
+    *,
+    group: Optional[str] = None,
+    job_type: Optional[str] = None,
+    tags: Optional[List[str]] = None,
+) -> wandb.run:
+    """Initialize a W&B run. Requires WANDB_API_KEY (or prior `wandb login`)."""
 
-    # Generate run name if not provided
     if run_name is None:
         run_name = f"{project_name}_{time.strftime('%Y%m%d_%H%M%S')}"
-    
-    # Initialize wandb
+
+    if not os.environ.get("WANDB_API_KEY") and wandb.api.api_key is None:
+        raise RuntimeError(
+            "WANDB_API_KEY is not set and no wandb login found. "
+            "Export WANDB_API_KEY from https://wandb.ai/authorize before training."
+        )
+
+    entity = os.environ.get("WANDB_ENTITY") or None
+    group = group or os.environ.get("WANDB_RUN_GROUP") or None
+    run_tags = tags or [project_name, "training", "tinyworlds"]
+
     run = wandb.init(
         project=project_name,
+        entity=entity,
         config=config,
         name=run_name,
-        tags=[project_name, "training"]
+        group=group,
+        job_type=job_type,
+        tags=run_tags,
+        resume="allow",
     )
-    
-    print(f"🚀 W&B run initialized: {run.name}")
-    print(f"📊 Project: {project_name}")
-    print(f"🔗 View at: {run.url}")
-    
+
+    # Keep train/val on the same x-axis in the UI.
+    wandb.define_metric("step")
+    wandb.define_metric("train/*", step_metric="step")
+    wandb.define_metric("val/*", step_metric="step")
+    wandb.define_metric("system/*", step_metric="step")
+    wandb.define_metric("learning_rate/*", step_metric="step")
+
+    print(f"W&B run initialized: {run.name}")
+    print(f"Project: {project_name}" + (f" (entity={entity})" if entity else ""))
+    print(f"View at: {run.url}")
+
     return run
 
 

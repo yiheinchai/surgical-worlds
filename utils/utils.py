@@ -217,6 +217,7 @@ def load_videotokenizer_from_checkpoint(checkpoint_path, device, model = None, i
         'num_blocks': cfg.get('num_blocks', 4),
         'latent_dim': cfg.get('latent_dim', 6),
         'num_bins': cfg.get('num_bins', 4),
+        'fg_weight': cfg.get('fg_weight', 0.0),
     }
     if model is None:
         model = VideoTokenizer(**kwargs)

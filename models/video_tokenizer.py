@@ -79,19 +79,21 @@ class VideoTokenizerDecoder(nn.Module):
 
 class VideoTokenizer(nn.Module):
     def __init__(self, frame_size=(128, 128), patch_size=8, embed_dim=128, num_heads=8,
-                 hidden_dim=256, num_blocks=4, latent_dim=3, num_bins=4):
+                 hidden_dim=256, num_blocks=4, latent_dim=3, num_bins=4,
+                 fg_weight: float = 0.0):
         super().__init__()
         self.encoder = VideoTokenizerEncoder(frame_size, patch_size, embed_dim, num_heads, hidden_dim, num_blocks, latent_dim)
         self.decoder = VideoTokenizerDecoder(frame_size, patch_size, embed_dim, num_heads, hidden_dim, num_blocks, latent_dim)
         self.quantizer = FiniteScalarQuantizer(latent_dim, num_bins)
         self.codebook_size = num_bins**latent_dim
+        self.fg_weight = fg_weight
 
     def forward(self, frames):
         # encode frames to latent representations, quantize, and decode back to frames
         embeddings = self.encoder(frames)  # [B, T, P, L]
         quantized_z = self.quantizer(embeddings)
         x_hat = self.decoder(quantized_z)  # [B, T, C, H, W]
-        recon_loss = reconstruction_loss(x_hat, frames)
+        recon_loss = reconstruction_loss(x_hat, frames, fg_weight=self.fg_weight)
         return recon_loss, x_hat
 
     def tokenize(self, frames):

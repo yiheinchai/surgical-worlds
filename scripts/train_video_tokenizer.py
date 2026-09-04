@@ -10,6 +10,7 @@ from utils.utils import readable_timestamp, save_training_state, prepare_stage_d
 from utils.config import VideoTokenizerConfig, load_stage_config_merged
 from utils.utils import save_training_state, load_videotokenizer_from_checkpoint
 from utils.wandb_utils import init_wandb, log_training_metrics, log_system_metrics, log_learning_rate, finish_wandb
+from utils.eval_utils import mean_loader_loss
 from dataclasses import asdict
 from utils.distributed import init_distributed_from_env, prepare_model_for_distributed, unwrap_model, print_param_count_if_main, cleanup_distributed
 from torch.distributed.fsdp import FSDPModule
@@ -59,6 +60,7 @@ def main():
         num_blocks=args.num_blocks,
         latent_dim=args.latent_dim,
         num_bins=args.num_bins,
+        fg_weight=getattr(args, 'fg_weight', 0.0),
     ).to(args.device)
     if args.checkpoint:
         model, _ = load_videotokenizer_from_checkpoint(
@@ -98,13 +100,21 @@ def main():
     # init wandb
     if args.use_wandb and is_main:
         cfg = asdict(args)
-        cfg.update({'timestamp': timestamp})
+        cfg.update({'timestamp': timestamp, 'stage': 'video_tokenizer'})
         run_name = f"video_tokenizer_{timestamp}"
-        init_wandb(args.wandb_project, cfg, run_name)
+        init_wandb(
+            args.wandb_project,
+            cfg,
+            run_name,
+            group=os.environ.get('WANDB_RUN_GROUP') or os.path.basename(run_root),
+            job_type='video_tokenizer',
+            tags=['video_tokenizer', args.dataset, 'tinyworlds'],
+        )
 
     unwrap_model(model).train()
 
     train_iter = iter(training_loader)
+    val_batches = int(os.environ.get('WANDB_VAL_BATCHES', '4'))
     for i in tqdm(range(args.n_updates), disable=not is_main):
         for opt in optimizers:
             opt.zero_grad(set_to_none=True)
@@ -151,13 +161,22 @@ def main():
 
         # save model and visualize results
         if i % args.log_interval == 0:
-            if args.use_wandb:
+            if args.use_wandb and is_main:
                 with torch.no_grad():
                     indices = unwrap_model(model).tokenize(x)
                     unique_codes = torch.unique(indices).numel()
                 codebook_usage = unique_codes / unwrap_model(model).codebook_size
-                if is_main:
-                    wandb.log({'train/codebook_usage': codebook_usage}, step=i)
+                wandb.log({'train/codebook_usage': codebook_usage, 'step': i}, step=i)
+
+                unwrap_model(model).eval()
+                def _vt_val_step(batch):
+                    with train_ctx:
+                        vloss, _ = unwrap_model(model)(batch)
+                    return vloss
+                val_loss = mean_loader_loss(_vt_val_step, validation_loader, args.device, n_batches=val_batches)
+                unwrap_model(model).train()
+                if val_loss is not None:
+                    wandb.log({'val/loss': val_loss, 'step': i}, step=i)
 
             hyperparameters = args.__dict__
             save_training_state(model, optimizers[0], schedulers[0], hyperparameters, checkpoints_dir, prefix='video_tokenizer', step=i)

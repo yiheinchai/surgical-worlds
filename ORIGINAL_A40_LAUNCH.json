@@ -1,0 +1,10 @@
+{
+  "instance_id": "49801668",
+  "offer_id": "47651207",
+  "dataset": "PICODOOM",
+  "wandb_project": "tinyworlds",
+  "wandb_group": "original-PICODOOM-20260903_231540",
+  "wandb_entity": "data1yihein",
+  "git_branch": "cursor/a40-original-tinyworlds-wandb-19ae",
+  "launched_at": "2026-09-03T23:15:41Z"
+}

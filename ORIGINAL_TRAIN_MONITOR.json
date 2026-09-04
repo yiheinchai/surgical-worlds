@@ -1,0 +1,37 @@
+{
+  "status": "STOPPED_EARLY",
+  "reason": "User requested backup + destroy after Dyn val plateau (~44k/300k) and demo showing ~20k best perceptual quality",
+  "destroyed_utc": "2026-09-04T15:12:00Z",
+  "instances_destroyed": ["49801668", "49855427"],
+  "backup": "/agent/checkpoint-backups/49801668/20260904_151009_FINAL",
+  "backup_symlink": "/agent/checkpoint-backups/49801668/FINAL",
+  "results_root_on_backup": "results/2026_09_03_23_40_55",
+  "checkpoints": {
+    "video_tokenizer": {
+      "count": 16,
+      "last": "video_tokenizer_step_37500",
+      "path": "/agent/checkpoint-backups/49801668/FINAL/results/2026_09_03_23_40_55/video_tokenizer/checkpoints/video_tokenizer_step_37500"
+    },
+    "latent_actions": {
+      "count": 20,
+      "last": "latent_actions_step_9500",
+      "path": "/agent/checkpoint-backups/49801668/FINAL/results/2026_09_03_23_40_55/latent_actions/checkpoints/latent_actions_step_9500"
+    },
+    "dynamics": {
+      "count": 23,
+      "last": "dynamics_step_44000",
+      "best_perceptual_approx": "dynamics_step_20000",
+      "path_last": "/agent/checkpoint-backups/49801668/FINAL/results/2026_09_03_23_40_55/dynamics/checkpoints/dynamics_step_44000",
+      "path_20k": "/agent/checkpoint-backups/49801668/FINAL/results/2026_09_03_23_40_55/dynamics/checkpoints/dynamics_step_20000"
+    }
+  },
+  "wandb": {
+    "entity": "data2yihein-d",
+    "project": "tinyworlds",
+    "group": "original-PICODOOM-20260903_234048",
+    "video_tokenizer": "https://wandb.ai/data2yihein-d/tinyworlds/runs/48l9ulop",
+    "latent_actions": "https://wandb.ai/data2yihein-d/tinyworlds/runs/4d5anb7o",
+    "dynamics": "https://wandb.ai/data2yihein-d/tinyworlds/runs/b9lhcat1"
+  },
+  "notes": "VT+LAM finished. Dyn stopped early at ~44k/300k. Timers unsubscribed."
+}

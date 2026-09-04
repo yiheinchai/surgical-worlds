@@ -10,6 +10,7 @@ from einops import rearrange
 from utils.wandb_utils import (
     init_wandb, log_training_metrics, log_learning_rate, log_system_metrics, finish_wandb, log_action_distribution
 )
+from utils.eval_utils import mean_loader_loss
 from utils.scheduler_utils import create_cosine_scheduler
 from utils.utils import (
     readable_timestamp,
@@ -124,7 +125,16 @@ def main():
     # init wandb
     if args.use_wandb and is_main:
         run_name = f"dynamics_{readable_timestamp()}"
-        init_wandb(args.wandb_project, asdict(args), run_name)
+        cfg = asdict(args)
+        cfg.update({'stage': 'dynamics'})
+        init_wandb(
+            args.wandb_project,
+            cfg,
+            run_name,
+            group=os.environ.get('WANDB_RUN_GROUP') or os.path.basename(run_root),
+            job_type='dynamics',
+            tags=['dynamics', args.dataset, 'tinyworlds'],
+        )
 
     unwrap_model(dynamics_model).train()
 
@@ -134,7 +144,7 @@ def main():
         data_overrides['fps'] = args.fps
     if hasattr(args, 'preload_ratio') and args.preload_ratio is not None:
         data_overrides['preload_ratio'] = args.preload_ratio
-    _, _, training_loader, _, _ = load_data_and_data_loaders(
+    _, _, training_loader, validation_loader, _ = load_data_and_data_loaders(
         dataset=args.dataset, 
         batch_size=args.batch_size_per_gpu,
         num_frames=args.context_length,
@@ -146,6 +156,7 @@ def main():
     train_iter = iter(training_loader)
 
     use_moe = getattr(args, 'use_moe', False)
+    val_batches = int(os.environ.get('WANDB_VAL_BATCHES', '4'))
 
     for i in tqdm(range(0, args.n_updates), disable=not is_main):
         for opt in optimizers:
@@ -203,7 +214,7 @@ def main():
 
         # wandb logging
         if args.use_wandb and is_main:
-            log_dict = {'train/loss': loss.item()}
+            log_dict = {'train/loss': loss.item(), 'step': i}
             if use_moe:
                 log_dict['train/moe_aux_loss'] = moe_aux_scalar
                 # per-expert utilization across blocks
@@ -241,6 +252,22 @@ def main():
                                 pixel_mask[b, t, patch_row:patch_row+patch_size, patch_col:patch_col+patch_size] = 1 # assigning 1 to the patch in the mask of dim [1, 1, Hp, Wp]
                 pixel_mask_expanded = rearrange(pixel_mask, 'b t h w -> b t 1 h w')
                 masked_frames = x * (1 - pixel_mask_expanded)
+
+                if args.use_wandb:
+                    unwrap_model(dynamics_model).eval()
+                    def _dyn_val_step(batch):
+                        tokens = video_tokenizer.tokenize(batch)
+                        latents = video_tokenizer.quantizer.get_latents_from_indices(tokens, dim=-1)
+                        actions = latent_action_model.encode(batch) if args.use_actions else None
+                        with train_ctx:
+                            _, _, vloss = unwrap_model(dynamics_model)(
+                                latents, training=True, conditioning=actions, targets=tokens
+                            )
+                        return vloss
+                    val_loss = mean_loader_loss(_dyn_val_step, validation_loader, args.device, n_batches=val_batches)
+                    unwrap_model(dynamics_model).train()
+                    if val_loss is not None:
+                        wandb.log({'val/loss': val_loss, 'step': i}, step=i)
             
             hyperparameters = args.__dict__
             ckpt_path = save_training_state(dynamics_model, optimizers[0], schedulers[0], hyperparameters, checkpoints_dir, prefix='dynamics', step=i)
