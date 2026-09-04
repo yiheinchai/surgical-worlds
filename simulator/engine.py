@@ -250,6 +250,77 @@ class SurgeryWorldEngine:
             return []
         return list(self.session.all_frames)
 
+    @torch.inference_mode()
+    def preview_next(self, action_id: int) -> Image.Image:
+        """Generate one next frame for `action_id` without advancing the session."""
+        if self.session is None:
+            self.reset()
+
+        context = self.session.context_frames
+        video_indices = self.video_tokenizer.tokenize(context)
+        video_latents = self.video_tokenizer.quantizer.get_latents_from_indices(video_indices)
+
+        # Build conditioning as if this action were appended, but do not mutate history.
+        recent = (self.session.action_history + [action_id])[-self.config.context_window :]
+        recent_tensor = repeat(
+            torch.tensor(recent, device=self.config.device, dtype=torch.long),
+            "i -> 1 i",
+        )
+        action_latent = self.latent_action_model.quantizer.get_latents_from_indices(recent_tensor)
+        if len(recent) < self.config.context_window:
+            pad_count = self.config.context_window - len(recent) + 1
+            gt_pad = self.latent_action_model.encode(context[:, :pad_count])
+            action_latent = torch.cat(
+                [self.latent_action_model.quantizer(gt_pad), action_latent], dim=1
+            )
+
+        def idx_to_latents(idx):
+            return self.video_tokenizer.quantizer.get_latents_from_indices(idx, dim=-1)
+
+        autocast_dtype = torch.bfloat16 if self.config.amp else None
+        with torch.amp.autocast(
+            self.config.device.split(":")[0],
+            enabled=self.config.amp and self.config.device.startswith("cuda"),
+            dtype=autocast_dtype,
+        ):
+            next_latents = self.dynamics_model.forward_inference(
+                context_latents=video_latents,
+                prediction_horizon=self.config.prediction_horizon,
+                num_steps=self.config.maskgit_steps,
+                index_to_latents_fn=idx_to_latents,
+                conditioning=action_latent,
+                temperature=self.config.temperature,
+            )
+        next_frames = self.video_tokenizer.detokenize(next_latents)
+        new_frame = next_frames[:, -self.config.prediction_horizon :]
+        return tensor_frame_to_pil(
+            new_frame[0, -1],
+            upscale=True,
+            display_aspect_width_scale=self._display_aspect(),
+            display_size=self.config.display_size,
+        )
+
+    def resync_from_ground_truth(self) -> Optional[Image.Image]:
+        """Replace rolled context with GT frames (teacher-force). Clears action history."""
+        if self.session is None or self.session.ground_truth_frames is None:
+            return None
+        gt = self.session.ground_truth_frames
+        end = min(
+            self.config.context_window + self.session.step_count,
+            gt.shape[1],
+        )
+        start = max(0, end - self.config.context_window)
+        self.session.context_frames = gt[:, start:end].clone()
+        self.session.action_history = []
+        if self.session.context_frames.shape[1] == 0:
+            return None
+        return tensor_frame_to_pil(
+            self.session.context_frames[0, -1],
+            upscale=True,
+            display_aspect_width_scale=self._display_aspect(),
+            display_size=self.config.display_size,
+        )
+
     @property
     def is_ready(self) -> bool:
         return self.session is not None

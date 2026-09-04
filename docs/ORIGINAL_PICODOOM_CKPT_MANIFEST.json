@@ -1,0 +1,101 @@
+{
+  "run_id": "2026_09_03_23_40_55",
+  "vast_instance": "49801668",
+  "dataset": "PICODOOM",
+  "stages": {
+    "video_tokenizer": {
+      "count": 16,
+      "first": "video_tokenizer_step_0",
+      "last": "video_tokenizer_step_37500",
+      "steps": [
+        "video_tokenizer_step_0",
+        "video_tokenizer_step_2500",
+        "video_tokenizer_step_5000",
+        "video_tokenizer_step_7500",
+        "video_tokenizer_step_10000",
+        "video_tokenizer_step_12500",
+        "video_tokenizer_step_15000",
+        "video_tokenizer_step_17500",
+        "video_tokenizer_step_20000",
+        "video_tokenizer_step_22500",
+        "video_tokenizer_step_25000",
+        "video_tokenizer_step_27500",
+        "video_tokenizer_step_30000",
+        "video_tokenizer_step_32500",
+        "video_tokenizer_step_35000",
+        "video_tokenizer_step_37500"
+      ]
+    },
+    "latent_actions": {
+      "count": 20,
+      "first": "latent_actions_step_0",
+      "last": "latent_actions_step_9500",
+      "steps": [
+        "latent_actions_step_0",
+        "latent_actions_step_500",
+        "latent_actions_step_1000",
+        "latent_actions_step_1500",
+        "latent_actions_step_2000",
+        "latent_actions_step_2500",
+        "latent_actions_step_3000",
+        "latent_actions_step_3500",
+        "latent_actions_step_4000",
+        "latent_actions_step_4500",
+        "latent_actions_step_5000",
+        "latent_actions_step_5500",
+        "latent_actions_step_6000",
+        "latent_actions_step_6500",
+        "latent_actions_step_7000",
+        "latent_actions_step_7500",
+        "latent_actions_step_8000",
+        "latent_actions_step_8500",
+        "latent_actions_step_9000",
+        "latent_actions_step_9500"
+      ]
+    },
+    "dynamics": {
+      "count": 23,
+      "first": "dynamics_step_0",
+      "last": "dynamics_step_44000",
+      "steps": [
+        "dynamics_step_0",
+        "dynamics_step_2000",
+        "dynamics_step_4000",
+        "dynamics_step_6000",
+        "dynamics_step_8000",
+        "dynamics_step_10000",
+        "dynamics_step_12000",
+        "dynamics_step_14000",
+        "dynamics_step_16000",
+        "dynamics_step_18000",
+        "dynamics_step_20000",
+        "dynamics_step_22000",
+        "dynamics_step_24000",
+        "dynamics_step_26000",
+        "dynamics_step_28000",
+        "dynamics_step_30000",
+        "dynamics_step_32000",
+        "dynamics_step_34000",
+        "dynamics_step_36000",
+        "dynamics_step_38000",
+        "dynamics_step_40000",
+        "dynamics_step_42000",
+        "dynamics_step_44000"
+      ]
+    }
+  },
+  "recommended": {
+    "video_tokenizer": "video_tokenizer_step_37500",
+    "latent_actions": "latent_actions_step_9500",
+    "dynamics_perceptual_best": "dynamics_step_20000",
+    "dynamics_last": "dynamics_step_44000"
+  },
+  "wandb": {
+    "entity": "data2yihein-d",
+    "project": "tinyworlds",
+    "group": "original-PICODOOM-20260903_234048",
+    "video_tokenizer": "https://wandb.ai/data2yihein-d/tinyworlds/runs/48l9ulop",
+    "latent_actions": "https://wandb.ai/data2yihein-d/tinyworlds/runs/4d5anb7o",
+    "dynamics": "https://wandb.ai/data2yihein-d/tinyworlds/runs/b9lhcat1"
+  }
+}

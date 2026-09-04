@@ -1,0 +1,14 @@
+{
+  "instance_id": "49062201",
+  "offer_id": "46173766",
+  "training_mode": "quick",
+  "data_source": "cholect50",
+  "max_videos": 10,
+  "launched_at": "2026-08-28T22:30:00Z",
+  "status": "running",
+  "when_back": {
+    "ssh": "vastai ssh 49062201",
+    "check_status": "cat /workspace/TRAINING_STATUS.json",
+    "train_log": "tail -f /workspace/vastai_train.log"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "status": "DESTROYED",
+  "instance_id": "49855427",
+  "destroyed_utc": "2026-09-04T15:12:00Z",
+  "note": "Demo GPU destroyed with training box after final backup"
+}
