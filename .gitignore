@@ -5,6 +5,10 @@ batch_visualizations/*
 wandb/*
 setup.sh
 inference_results/
+.venv/
+.pytest_cache/
+.env
+.env.*
 
 # Large files — use scripts/chunk_large_files.py before committing to GitHub
 *.h5

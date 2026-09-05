@@ -1,0 +1,165 @@
+{
+  "sample": {
+    "n_clips": 32,
+    "frame_starts": [
+      300,
+      386,
+      472,
+      559,
+      645,
+      732,
+      818,
+      905,
+      991,
+      1078,
+      1164,
+      1251,
+      1337,
+      1424,
+      1510,
+      1597,
+      1683,
+      1770,
+      1856,
+      1943,
+      2029,
+      2116,
+      2202,
+      2289,
+      2375,
+      2462,
+      2548,
+      2635,
+      2721,
+      2808,
+      2894,
+      2981
+    ],
+    "full_frame_count": 59785,
+    "preload_end": 2989,
+    "precision": "CPU float32"
+  },
+  "lam": {
+    "counts": [
+      80,
+      11,
+      5,
+      0
+    ],
+    "fractions": [
+      0.8333333134651184,
+      0.1145833358168602,
+      0.0520833320915699,
+      0.0
+    ],
+    "entropy_nats": 0.5540755987167358,
+    "raw_mean_per_dim": [
+      -0.45313534140586853,
+      -0.8341696858406067
+    ],
+    "raw_variance_per_dim": [
+      0.3035472631454468,
+      0.4848747253417969
+    ],
+    "training_variance_stat": 0.3926945626735687,
+    "constant_code0_latent": [
+      [
+        -1.0,
+        -1.0
+      ]
+    ],
+    "variance_penalty": 0,
+    "copy_previous": {
+      "l1": 0.153997004032135,
+      "reconstruction_objective": 0.06728877127170563
+    },
+    "unmasked_eval_context": {
+      "encoded": {
+        "l1": 0.17157131433486938,
+        "reconstruction_objective": 0.05779847130179405,
+        "first_transition_l1": 0.1535312980413437
+      },
+      "constant_code0": {
+        "l1": 0.17787058651447296,
+        "reconstruction_objective": 0.06095856428146362,
+        "first_transition_l1": 0.1555790901184082
+      },
+      "shuffled": {
+        "l1": 0.18186865746974945,
+        "reconstruction_objective": 0.062178365886211395,
+        "first_transition_l1": 0.1588686853647232
+      }
+    },
+    "masked_training_context": {
+      "encoded": {
+        "l1": 0.17167580127716064,
+        "reconstruction_objective": 0.05752931162714958,
+        "first_transition_l1": 0.1535312980413437
+      },
+      "constant_code0": {
+        "l1": 0.1829298585653305,
+        "reconstruction_objective": 0.06247246265411377,
+        "first_transition_l1": 0.1555790901184082
+      },
+      "shuffled": {
+        "l1": 0.19408291578292847,
+        "reconstruction_objective": 0.0659731850028038,
+        "first_transition_l1": 0.1588686853647232
+      }
+    }
+  },
+  "tokenizer": {
+    "l1": 0.06603764742612839,
+    "reconstruction_objective": 0.0249637458473444
+  },
+  "dynamics": {
+    "20000": {
+      "training_masks_encoded": 3.7037264108657837,
+      "training_masks_shuffled": 3.7156733870506287,
+      "training_masks_constant_code0": 3.7093395590782166,
+      "fully_masked_next_frame_correct_context": 6.499329566955566,
+      "fully_masked_next_frame_shuffled_context": 8.13893175125122,
+      "controlled_target_visibility_ce": {
+        "partial_target": 3.801618993282318,
+        "fully_hidden_target": 6.49963915348053,
+        "fully_hidden_target_shuffled_actions": 6.493890047073364
+      },
+      "one_step_maskgit_16": {
+        "l1": 0.3027978837490082,
+        "reconstruction_objective": 0.13428230583667755
+      },
+      "copy_previous_last_frame": {
+        "l1": 0.15743200480937958,
+        "reconstruction_objective": 0.06409040838479996
+      },
+      "tokenizer_last_frame": {
+        "l1": 0.059831589460372925,
+        "reconstruction_objective": 0.021994810551404953
+      }
+    },
+    "44000": {
+      "training_masks_encoded": 3.621278405189514,
+      "training_masks_shuffled": 3.6263604164123535,
+      "training_masks_constant_code0": 3.6227659583091736,
+      "fully_masked_next_frame_correct_context": 6.46019721031189,
+      "fully_masked_next_frame_shuffled_context": 7.722944378852844,
+      "controlled_target_visibility_ce": {
+        "partial_target": 3.7796459197998047,
+        "fully_hidden_target": 6.425543189048767,
+        "fully_hidden_target_shuffled_actions": 6.485940933227539
+      },
+      "one_step_maskgit_16": {
+        "l1": 0.22152657806873322,
+        "reconstruction_objective": 0.08589061349630356
+      },
+      "copy_previous_last_frame": {
+        "l1": 0.15743200480937958,
+        "reconstruction_objective": 0.06409040838479996
+      },
+      "tokenizer_last_frame": {
+        "l1": 0.059831589460372925,
+        "reconstruction_objective": 0.021994810551404953
+      }
+    }
+  }
+}
