@@ -1,0 +1,7 @@
+{
+  "status": "completed_fixed_steps",
+  "optimizer_steps_completed": 1000,
+  "best_validation_step": 1000,
+  "best_validation_metric": 0.04258091375231743,
+  "elapsed_seconds": 76.92602267488837
+}

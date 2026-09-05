@@ -1,0 +1,162 @@
+{
+  "cpu_tests": {
+    "command": "WANDB_MODE=disabled MPLBACKEND=Agg OMP_NUM_THREADS=2 .venv/bin/python -m pytest -q",
+    "cwd": "repository root",
+    "local": "16 passed",
+    "gpu_host": "16 passed before the final logging-only hook fix"
+  },
+  "logging_fixture": {
+    "purpose": "CPU logging integration fixture; no PicoDoom evidence",
+    "optimizer_steps": 100,
+    "wandb_mode": "offline",
+    "parameter_histogram_keys": 121,
+    "gradient_histogram_keys": 121,
+    "max_wandb_step": 100,
+    "journal_name": "run-qy5eu83h.wandb"
+  },
+  "compileall": "passed: datasets models scripts utils tests",
+  "diff_check": "passed",
+  "cloud_cpu_smoke": "passed",
+  "moving_square_diagnostic": "completed; original cloud numerical fixture and separate Mac/Torch variant retained",
+  "weights_loaded": "strict state_dict with weights_only=True",
+  "gpu_optimizer_updates": 35100,
+  "source_data_sha256": "b046148d6a1462fc191bb7dbb0f953431d430d650fe276457d639791a183e7e5",
+  "notes": [
+    "An invocation from the parent directory imported unrelated global packages and failed collection; the documented repository-root command passes.",
+    "The local torch development build is a different environment from the original cloud CPU record; its numeric diagnostic is stored separately.",
+    "Final GPU models were not retrained after the parameter-hook logging fix.",
+    "W&B journal sync exit code 0 does not guarantee artifact upload; raw top-level files are republished as a consolidated evidence artifact.",
+    "The large combined W&B artifact upload timed out. The complete 304 MB local zip was CRC-tested; the smaller reviewed W&B bundle is tracked separately."
+  ],
+  "archive_verification": {
+    "all_results.tar.gz": {
+      "sha256": "3379a31d05f2d383cc36f636748b8729ff38cbb79138ea943a6bada61bbcd624",
+      "bytes": 133896911
+    },
+    "scratch_results.tar.gz": {
+      "sha256": "26f069b85ef59326e4e35a78ba7ab3a15a656dcf14aebe8aa393633991684a8f",
+      "bytes": 42376214
+    },
+    "completed_training_runs": 16,
+    "completed_gpu_optimizer_updates": 35100
+  },
+  "artifact_integrity": {
+    "credential_scan_files": 504,
+    "credential_matches": 0,
+    "final_weights": {
+      "dynamics_legacy_reference_s0": {
+        "sha256": "272f342e19e35fa3f2246e2a2cbb9ce04dd20ae85ae53232d1e753adba4a202e",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "dynamics_legacy_reference_s1": {
+        "sha256": "f3ae1653c97a9d0548ad31802b91a17ecaa8ac0eb9c45544111aa3eb786bacd7",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "dynamics_next_frame_5000_s0": {
+        "sha256": "8a3f6d40a945a430affa2c4f97be16d7082d404cbdc776fe15e7d34e2a91ea62",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "dynamics_next_frame_s0": {
+        "sha256": "d4319892b77989fb2f09d69c52939858ebda2fbcca06f0a5cafecc1798be95b4",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "dynamics_next_frame_s1": {
+        "sha256": "4b67f12abd17c5185842a31bd3b9b3edbeb1e2c2593596c12f76bd49e40b0b99",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_benchmark_100": {
+        "sha256": "da05eaa68420c6d4a57d1597863c0405f424aa0110d6ed8ef531f26e8b5b9e72",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_information_5000_s0": {
+        "sha256": "3d3ac3bcb3a3ed57c812b649a00fd246d383855087a9f456467039402bb1b405",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_information_s0": {
+        "sha256": "76dd7096fc1bdd47eacc78714e5f8ee88eeb9d0048b74d089864431e31425cba",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_information_s1": {
+        "sha256": "2a43d2ce7aef6e2bebd314753cf3d280f45949a352d227cf760f9881a0ce2368",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_reference_5000_s0": {
+        "sha256": "41f9c9505ba38f21d41e56269932b53a540afca139ce0962b8708d86986d9989",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_reference_s0": {
+        "sha256": "70c4e8e040b8784125cf87d120bcd00b1faaef98ebfe51a34ce95a178f291264",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "lam_pair_reference_s1": {
+        "sha256": "b963793ac382b06871389aef39e2a9d4d10c17c73705537488042ec2ab66e1b9",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "synthetic_branched_information": {
+        "sha256": "8d4bf3c1bdf7e5ef3016a5a0ffc7face48b09b636d9c729f5b0ccfc5215c0e3c",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "synthetic_branched_reference": {
+        "sha256": "a281fefb8d208d09b3d4cc31c8f14cb0cf7c2fdcb38afa9d7307deaf7ff78ab3",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "synthetic_scratch_information": {
+        "sha256": "8159b454bd93b71beb69d3198da15fa7f7a0de4d0f74ef89c004230de880a3ab",
+        "strict_load": true,
+        "all_tensors_finite": true
+      },
+      "synthetic_scratch_reference": {
+        "sha256": "d2e49975407dec67ade7e431425938be6b48601b6b9f571300ed13245230a32d",
+        "strict_load": true,
+        "all_tensors_finite": true
+      }
+    },
+    "scratch_and_checkpoint_trained_weights_differ": true
+  },
+  "wandb_scientific_completion": {
+    "checked_at_utc": "2026-09-05T13:17:51.101749+00:00",
+    "finished_run_ids": [
+      "6wxqlqzf",
+      "bwmrvv8e",
+      "g893ppwt",
+      "yg96tj3k",
+      "ye65fsqa",
+      "er2bg73t",
+      "xza73yu6",
+      "01a2bfri",
+      "ov2qasle",
+      "7zp7iydp",
+      "my9b0iw2",
+      "kvzabm0o",
+      "fqztz9xh",
+      "n08xj1yd",
+      "5t0cqw8m",
+      "rgguii34",
+      "qwwcz137",
+      "fii1pghv",
+      "8041jdcj",
+      "koi55py0",
+      "bec19hyd",
+      "e50nfwob",
+      "2kh4rem2",
+      "j13mur8x",
+      "hpw0k7vh",
+      "cii8i23h"
+    ],
+    "count": 26
+  }
+}

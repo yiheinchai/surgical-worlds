@@ -1,0 +1,9 @@
+{
+  "purpose": "CPU logging integration fixture; no PicoDoom evidence",
+  "optimizer_steps": 100,
+  "wandb_mode": "offline",
+  "parameter_histogram_keys": 121,
+  "gradient_histogram_keys": 121,
+  "max_wandb_step": 100,
+  "journal_name": "run-qy5eu83h.wandb"
+}

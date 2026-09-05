@@ -2,7 +2,10 @@
 
 The strongest evidence points to a mismatch between the prediction task used for training and the task required for generation, alongside weak discrete action learning. More training on the current recipe is a poor next experiment. The existing train/validation interpretation also needs correction.
 
-This is an investigation record, not a retraining result. No training implementation was changed and no cloud training was launched.
+This section records the initial audit before implementation and retraining.
+The subsequent [bounded GPU investigation](BOUNDED_GPU_REPORT.md) records the
+implemented fixes, matched retraining experiments, live W&B artifacts, and
+remaining blockers. Its results supersede this audit's implementation status.
 
 **User requirement:** keep training unsupervised and video-only, as in DeepMind's Genie. The experiment plan below uses no action labels or robot telemetry as training supervision.
 

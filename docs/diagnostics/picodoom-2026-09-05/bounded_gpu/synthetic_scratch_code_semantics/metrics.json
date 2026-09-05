@@ -1,0 +1,26 @@
+{
+  "reference": {
+    "train_selected_code_to_translation": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "train_mapping_accuracy": 0.25,
+    "validation_mapping_accuracy": 0.25,
+    "validation_code_entropy_given_texture": -0.0,
+    "validation_all_branches_same_code_fraction": 1.0
+  },
+  "information": {
+    "train_selected_code_to_translation": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "train_mapping_accuracy": 0.25,
+    "validation_mapping_accuracy": 0.2421875,
+    "validation_code_entropy_given_texture": 0.017572972923517227,
+    "validation_all_branches_same_code_fraction": 0.96875
+  }
+}

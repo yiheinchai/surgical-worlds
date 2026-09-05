@@ -1,0 +1,18 @@
+{
+  "final_train_ce": 0.8531516194343567,
+  "initial_train_ce": 1.185795783996582,
+  "metrics": {
+    "constant_action/fully_hidden_ce": 0.8338124752044678,
+    "constant_action/one_step_l1": 1.0196772813796997,
+    "constant_action/partial_reconstruction_ce": 1.45144784450531,
+    "copy_frame/l1": 0.0625,
+    "inferred_action/fully_hidden_ce": 0.8345494270324707,
+    "inferred_action/one_step_l1": 1.0196772813796997,
+    "inferred_action/partial_reconstruction_ce": 1.4589556455612183,
+    "shuffled_action/fully_hidden_ce": 0.8356066942214966,
+    "shuffled_action/one_step_l1": 1.0196772813796997,
+    "shuffled_action/partial_reconstruction_ce": 1.4600883722305298
+  },
+  "seed": 23,
+  "updates": 12
+}
