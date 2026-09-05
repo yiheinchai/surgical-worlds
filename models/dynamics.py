@@ -108,7 +108,17 @@ class DynamicsModel(nn.Module):
         return result
 
     @torch.no_grad()
-    def forward_inference(self, context_latents, prediction_horizon, num_steps, index_to_latents_fn, conditioning=None, schedule_k=5.0, temperature: float = 0.0):
+    def forward_inference(self, context_latents, prediction_horizon, num_steps, index_to_latents_fn, conditioning=None, schedule_k=5.0, temperature: float = 0.0, decoding_mode: str = "maskgit"):
+        """Generate tokens; one_pass matches the fully hidden next-frame task.
+
+        The legacy MaskGIT default is preserved. num_steps=1 in that algorithm
+        can perform a partial fill followed by another forward pass, so it is
+        not equivalent to the explicit one_pass mode.
+        """
+        if decoding_mode not in ("maskgit", "one_pass"):
+            raise ValueError(f"Unknown decoding_mode={decoding_mode!r}")
+        if decoding_mode == "one_pass" and prediction_horizon != 1:
+            raise ValueError("one_pass requires prediction_horizon=1; roll out autoregressively for longer predictions")
         # MaskGIT-style iterative decoding across all prediction horizon steps
         # context_latents: [B, T_ctx, P, L]
         # T_ctx=context timesteps, H=prediction horizon, K=codebook size
@@ -120,6 +130,14 @@ class DynamicsModel(nn.Module):
         # append prediction_horizon masked frame latents to predict dynamics on
         mask_latents = self.mask_token.to(device, dtype).expand(B, H, P, -1)  # [B, H, P, L]
         input_latents = torch.cat([context_latents, mask_latents], dim=1)  # [B, T_ctx+H, P, L]
+        if decoding_mode == "one_pass":
+            logits, _, _ = self.forward(input_latents, training=False, conditioning=conditioning)
+            next_logits = logits[:, -1:]
+            if temperature and temperature > 0:
+                indices = torch.distributions.Categorical(logits=next_logits / float(temperature)).sample()
+            else:
+                indices = next_logits.argmax(dim=-1)
+            return torch.cat([context_latents, index_to_latents_fn(indices)], dim=1)
         mask = torch.ones(B, H, P, 1, dtype=torch.bool, device=device)  # [B, H, P, 1]
 
         P_total = H * P  # total masked positions across the horizon window

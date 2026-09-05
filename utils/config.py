@@ -315,6 +315,8 @@ class InferenceConfig:
 	# Interactive mode (user enters action ids)
 	use_interactive_mode: bool
 	preload_ratio: Optional[float] = None
+	decoding_mode: str = "maskgit"
+	maskgit_steps: int = 10
 
 
 def load_config(config_cls, default_config_path: Optional[str] = None):
