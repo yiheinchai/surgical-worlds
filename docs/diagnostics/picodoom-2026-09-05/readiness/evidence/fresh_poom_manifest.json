@@ -1,0 +1,40 @@
+{
+  "config": {
+    "output": "/workspace/picodoom/data/fresh_poom_v1",
+    "episodes": 3,
+    "seconds": 90,
+    "fps": 30,
+    "seed": 7101
+  },
+  "episodes": [
+    {
+      "episode": 0,
+      "frames": 2700,
+      "elapsed_seconds": 89.97215220599901,
+      "median_frame_interval": 0.03327681799419224,
+      "p95_frame_interval": 0.03679598504677415,
+      "mean_frame_change_u8": 13.202973365783691,
+      "sha256": "3eb478299d046bdfd32651342935e3cc91a29955e31bfb7612d3ac9019447a91"
+    },
+    {
+      "episode": 1,
+      "frames": 2700,
+      "elapsed_seconds": 89.97284576203674,
+      "median_frame_interval": 0.033278518938459456,
+      "p95_frame_interval": 0.03770070286700502,
+      "mean_frame_change_u8": 14.9559965133667,
+      "sha256": "3207e286df01dae7f19f5ee7d11c3910eacbbc933ebc303fd285df8b6e998438"
+    },
+    {
+      "episode": 2,
+      "frames": 2700,
+      "elapsed_seconds": 89.97350687999278,
+      "median_frame_interval": 0.03329244803171605,
+      "p95_frame_interval": 0.03663364393869415,
+      "mean_frame_change_u8": 13.732346534729004,
+      "sha256": "80e0b9df9342b84251306ba6c100cefbe4d9bbbaa52e89fdd0b8c2b0aeb1c929"
+    }
+  ],
+  "attribution": "POOM by freds72 and Paranoid Cactus; https://freds72.itch.io/poom; game assets CC BY-NC 4.0",
+  "holdout_policy": "Episode 0: development. Episodes 1 and 2: retain as uninspected holdouts until development choices are frozen. No fresh frames used to train the current pilots."
+}

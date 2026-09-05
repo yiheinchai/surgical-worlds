@@ -1,0 +1,8 @@
+{
+  "file": "readiness_checkpoint.tar.gz",
+  "sha256": "9b482ba2514789d874b869aa486428aef9ec158d7b3af7990f82250b39160288",
+  "bytes": 261507784,
+  "files": 215,
+  "verification": "All 215 members verified against individual SHA256 hashes after safe extraction.",
+  "scope": "Snapshot before the Fourier and capacity comparisons; includes completed exposure comparison."
+}

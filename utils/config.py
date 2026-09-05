@@ -222,11 +222,14 @@ class DynamicsConfig:
 	# other params
 	fps: Optional[int] = None
 	preload_ratio: Optional[float] = None
+	objective_mode: str = "next_frame"
 	
 	def __post_init__(self) -> None:
 		_validate_amp_fsdp(self.amp, self.distributed)
 		_validate_distibuted_training(self.nproc_per_node, self.distributed)
 		_validate_distributed_device(self.device, self.distributed)
+		if self.objective_mode not in {"next_frame", "legacy_maskgit"}:
+			raise ValueError("objective_mode must be 'next_frame' or 'legacy_maskgit'")
 
 
 @dataclass
@@ -312,6 +315,8 @@ class InferenceConfig:
 	# Interactive mode (user enters action ids)
 	use_interactive_mode: bool
 	preload_ratio: Optional[float] = None
+	decoding_mode: str = "maskgit"
+	maskgit_steps: int = 10
 
 
 def load_config(config_cls, default_config_path: Optional[str] = None):

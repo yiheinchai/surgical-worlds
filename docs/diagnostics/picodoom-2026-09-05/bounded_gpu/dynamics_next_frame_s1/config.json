@@ -1,0 +1,45 @@
+{
+  "stage": "dynamics",
+  "name": "dynamics_next_frame_s1",
+  "data": "data/picodoom_frames.h5",
+  "checkpoints": "data/checkpoints",
+  "output": "results/bounded-20260905",
+  "device": "cuda",
+  "seed": 1,
+  "steps": 1000,
+  "max_seconds": 1800,
+  "batch": 16,
+  "train_clips": 4096,
+  "eval_clips": 128,
+  "lr": 0.0001,
+  "log_every": 50,
+  "eval_every": 500,
+  "init": "checkpoint",
+  "objective": "next_frame",
+  "information_weight": 0.0,
+  "lam_weights": null,
+  "dynamics_weights": null,
+  "pairwise_actions": false,
+  "test": false,
+  "rollouts": false,
+  "wandb_mode": "offline",
+  "stopping": "fixed optimizer steps; no validation early stopping",
+  "max_wall_seconds": 1800,
+  "data_supervision": "RGB video only",
+  "precision": "float32 with TF32 on CUDA",
+  "gradient_accumulation_steps": 1,
+  "source_ranges": {
+    "train": [
+      300,
+      46000
+    ],
+    "validation": [
+      47000,
+      53000
+    ],
+    "test": [
+      54000,
+      59785
+    ]
+  }
+}

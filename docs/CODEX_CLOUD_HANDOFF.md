@@ -8,12 +8,27 @@ This branch starts from the actual PicoDoom experiment branch, commit `22b7aefa6
 
 ## Read first
 
+The user subsequently authorized continued small GPU experiments within the
+remaining Vast credit to establish full-run readiness. The active continuation is
+documented in [`readiness/PROGRESS.md`](diagnostics/picodoom-2026-09-05/readiness/PROGRESS.md)
+and [`readiness/PLAN.md`](diagnostics/picodoom-2026-09-05/readiness/PLAN.md).
+It is still an investigation: improved one-step motion and sharper rollouts do
+not establish sustained control or a playable game. Read these newer records
+before interpreting the previous campaign's stopping point as the current task.
+
+The first cloud implementation is now recovered and committed separately. The
+subsequent user-authorized bounded GPU investigation is documented in
+[`BOUNDED_GPU_REPORT.md`](diagnostics/picodoom-2026-09-05/BOUNDED_GPU_REPORT.md),
+with exact controls in [`BOUNDED_GPU_PLAN.md`](diagnostics/picodoom-2026-09-05/BOUNDED_GPU_PLAN.md).
+Consult those before choosing another training run; the original audit below
+remains historical evidence, not the current implementation status.
+
 1. `docs/diagnostics/picodoom-2026-09-05/README.md` — findings and the revised video-only experiment plan.
 2. `docs/diagnostics/picodoom-2026-09-05/probe_results.json` — CPU float32 checkpoint probes.
 3. `docs/diagnostics/picodoom-2026-09-05/audit_metrics.json` — sanitized live W&B histories and data/masking checks. Analyze it programmatically; avoid printing the full histories.
 4. `docs/ORIGINAL_PICODOOM_HANDOFF.md` — checkpoint locations and historical context. Its claimed three-point train/validation gap is a logging artifact; its “held-out validation” is not actually held out; a balanced histogram alone is not a success criterion. See the newer diagnosis.
 
-## Confirmed findings
+## Initial audit findings, before implementation
 
 - Dynamics training logs loss after division by gradient accumulation (4), while validation logs undivided CE. Corrected train and validation losses both plateau near four.
 - PicoDoom train and validation loaders receive identical frames because `disable_test_split=True` remains the default. The loaded prefix comprises 2,689 frames and 2,681 overlapping windows. Split episodes, or separate contiguous ranges with a context gap; do not randomly split overlapping windows.
@@ -24,7 +39,7 @@ This branch starts from the actual PicoDoom experiment branch, commit `22b7aefa6
 - On eight in-sample one-step probes, dynamics@44k beats @20k but both lose to copying the previous frame. This does not establish the best long-rollout checkpoint.
 - No fix has been trained yet. Do not report these diagnostic findings as a completed solution.
 
-## First cloud task: make the next experiment interpretable
+## Completed first cloud task: make the next experiment interpretable
 
 Implement and validate the smallest coherent changes necessary for the next video-only experiment:
 

@@ -1,0 +1,23 @@
+{
+  "dataset_url": "https://huggingface.co/datasets/AlmondGod/TinyWorlds/resolve/main/picodoom_frames.h5",
+  "dataset_sha256": "b046148d6a1462fc191bb7dbb0f953431d430d650fe276457d639791a183e7e5",
+  "original_checkpoint_archive_sha256": "81e61101aaa03e15aca58f762a08f338f856e2f95ab01a4013e87ef7465bcbc7",
+  "initial_runner_sha256": "b51e816ef6acf21d3cd9ba0675be0ab0926a494846b9defa78aab3a27e1b7f88",
+  "initial_credit_usd": 8.663850602839517,
+  "gpu": "RTX 4090",
+  "hourly_quote_usd": 0.32342592592592595,
+  "python": "3.12.14",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "cloud_import_commit": "74f2338",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "wandb": "0.29.0",
+    "numpy": "2.5.2",
+    "h5py": "3.16.0",
+    "einops": "0.8.2",
+    "Pillow": "11.3.0",
+    "cv2": "5.0.0",
+    "pytest": "9.1.1"
+  }
+}
