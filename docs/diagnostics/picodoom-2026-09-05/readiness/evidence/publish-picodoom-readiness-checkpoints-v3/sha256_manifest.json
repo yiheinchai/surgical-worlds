@@ -1,0 +1,418 @@
+{
+  "results/readiness/event-prior-pilot/motion_events.npz": {
+    "bytes": 701896,
+    "sha256": "1a1988b8bb850f9ece19cd2b0495165eab6c7059e68ca581c96e32e814df772a"
+  },
+  "results/readiness/event-prior-pilot/preparation.json": {
+    "bytes": 969,
+    "sha256": "e47847cd208f600e9b199c259e3646b57c5d3089ccae0b1be74b3acf7965e990"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/config.json": {
+    "bytes": 1896,
+    "sha256": "8f83fbfe2dc797d577ac691f79205c754fbdc5c920e979ab0c12edaf743f31c1"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/ema_027000.pt": {
+    "bytes": 32639074,
+    "sha256": "30a30a507591a4c63916a0a01cd8ba30edc58083d0583b4dc00e367ac5e658f8"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/evaluation_026000.json": {
+    "bytes": 175676,
+    "sha256": "165e65e945fdd3bd48dff049e55ea319259e76bf0854679246ab7195506eab1e"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/evaluation_027000.json": {
+    "bytes": 175709,
+    "sha256": "1e18245c32771d9c8bc8f5a1e54bf8ce30c594adb59a3b924908aa0821dc6ac9"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/interventions_026000.json": {
+    "bytes": 84621,
+    "sha256": "82aa54b37a1d81050b9c2207536d239aa2be869f81d13ca07699e93838ccf0e4"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/interventions_026000.png": {
+    "bytes": 1496086,
+    "sha256": "3862edff1e99480ea53c40ace96488d1acb25e4a7bf9096ce59165e290ed91a9"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/interventions_027000.json": {
+    "bytes": 84689,
+    "sha256": "488fcead482d08fd6203b7a956321ad1a19b2e525bcaf445a980b2e90d485148"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/interventions_027000.png": {
+    "bytes": 1494657,
+    "sha256": "d2e9ce46eb4b1eeecc12b2bf593f04aabb0581e9075210a69ad74c1aef5e1932"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/metrics.jsonl": {
+    "bytes": 14944,
+    "sha256": "9b942ab0c9b9b97978ee2b0fe061a0db66e03950f1df3490756353a458d644b2"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/predictions_026000.png": {
+    "bytes": 457746,
+    "sha256": "cfb0f55c5ea08dae90b42a647bacafa26fe2492616d54edd9fd77a37971e0d7b"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/predictions_027000.png": {
+    "bytes": 457887,
+    "sha256": "a4ac6bc7568311851379488a29fe0d4620c4578e0e1bc2eaf5bb9473e6b2e9a0"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/source_at_run/motion_codes.py": {
+    "bytes": 2647,
+    "sha256": "8cd8c54b5a0c8c0586b69816d302529f94b9ab2864dcd171d5d0ef6d9175bd38"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/source_at_run/pixel_diffusion.py": {
+    "bytes": 12040,
+    "sha256": "9019b2caccd4d8520be36e3d370c0cf8f64067430873af2c426870f52291f59d"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/source_at_run/residual_events.py": {
+    "bytes": 3119,
+    "sha256": "2ea4ea0be9def1a7f998b5e58d89b8e1c635bbb06add12a661d7d99730894bca"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/source_at_run/train_pixel_dynamics.py": {
+    "bytes": 25146,
+    "sha256": "d4f4fce63b2c3d08cffd4317ba2a3cfbc3d9f431920bfadeaec61d236b3b2da9"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/status.json": {
+    "bytes": 75,
+    "sha256": "9f0ac8fe81cbacc23d176a965c48ad984e9c84adffaa5baf678ca9f3ca441111"
+  },
+  "results/readiness/pixel-event-prior-w64-27k/validation_starts.json": {
+    "bytes": 1792,
+    "sha256": "e213232b58029be36ac286eb8f493cebde44bb2d04fb1fdaf5abf642283ccd01"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/24.gif": {
+    "bytes": 2561585,
+    "sha256": "502c7be686a90164423917ed93a393057f17d59742a0957ecb0db7b18050ba09"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/24.png": {
+    "bytes": 293368,
+    "sha256": "4f576a2babd380a35a875979d2f7ef516115b7452e8e162108e0da35a90ef2e6"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/25.gif": {
+    "bytes": 2224585,
+    "sha256": "f053e6541cee24692be3c7f74f234e164bfc5d9b88ee12687bae27236d2bb7bd"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/25.png": {
+    "bytes": 288035,
+    "sha256": "4ea0f29cd7e3698d0034890f42322035f6894abfc1553cc349c588c68b2c1e40"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/oracle.gif": {
+    "bytes": 2395286,
+    "sha256": "69c46974b1f22b0d6bbde044c9b6fbacdf196a36b274b61ff6da6000bc546920"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/oracle.png": {
+    "bytes": 287159,
+    "sha256": "d68156ba9f5378a053fb04f90eef52b8c9814365728dba1c7a27842756e3b92e"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/pulse.gif": {
+    "bytes": 2559974,
+    "sha256": "cd0e899de5cdad526ea2e75191579e8bb4c67721734ac04f201589f69bae91b8"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/pulse.png": {
+    "bytes": 293815,
+    "sha256": "9216395d7a9d8da0ad22b627b1036e6e33f9dba72ccf7d4959c8c156301ba950"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/pulse_move.gif": {
+    "bytes": 2248276,
+    "sha256": "2ac37f6c51c77510119f1b0cd3ee8f10de6d9de79817b672bcfd157765f5332e"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/pulse_move.png": {
+    "bytes": 279058,
+    "sha256": "e5eb87e26a5cf2058b68d93f98403c2e3bce3bb8a4e0df215153c610c96ae03e"
+  },
+  "results/readiness/pixel-event-prior-w64-27k-rollouts/results.json": {
+    "bytes": 182792,
+    "sha256": "f5a1a00ca96b408f7e052efd0b8246cef0536c7834f28cdd1bd63106c47cb0cf"
+  },
+  "results/readiness/pixel-events-w64-27k/config.json": {
+    "bytes": 1778,
+    "sha256": "b8f1e51d8746f13d9ef5ee1f3ef7314a5d8fb0ffb3f9cf28e6c5a30cedb3d5a8"
+  },
+  "results/readiness/pixel-events-w64-27k/ema_027000.pt": {
+    "bytes": 32442081,
+    "sha256": "ce0d913bf7c1916c49c242760bb763a16e6c5d0f60dbe36e3914786682caa16a"
+  },
+  "results/readiness/pixel-events-w64-27k/evaluation_026000.json": {
+    "bytes": 175277,
+    "sha256": "258f8692baa4176d3085c73ce43cbd8da45ce36f49bf1bdcab07205b87ac88bb"
+  },
+  "results/readiness/pixel-events-w64-27k/evaluation_027000.json": {
+    "bytes": 175253,
+    "sha256": "532f5bad18d9df95451eca69b67d0a4b701abb67015fc5c43881d55d9131331e"
+  },
+  "results/readiness/pixel-events-w64-27k/interventions_026000.json": {
+    "bytes": 84531,
+    "sha256": "359e105e3d3b03fc98680b24212ea77b9bede899b092e9094a69a20885535b4e"
+  },
+  "results/readiness/pixel-events-w64-27k/interventions_026000.png": {
+    "bytes": 1497167,
+    "sha256": "068513ba9208f0dd70f22ee3c958cfe86b4378f0ee1e7843600f4e5172b9c65b"
+  },
+  "results/readiness/pixel-events-w64-27k/interventions_027000.json": {
+    "bytes": 84710,
+    "sha256": "a4125aba987ec3370c35fc95e3e5589d2fe1131b48ea0bf7a24c19aace63167a"
+  },
+  "results/readiness/pixel-events-w64-27k/interventions_027000.png": {
+    "bytes": 1495483,
+    "sha256": "c2aac27a576095be614f16e855d5f4598a56f14bbe80891da6e00fe7906c4348"
+  },
+  "results/readiness/pixel-events-w64-27k/metrics.jsonl": {
+    "bytes": 12964,
+    "sha256": "0ea90ee07113bdd0219d08c543f1cbc897bc02ca8393b81a2d4177a952874cc1"
+  },
+  "results/readiness/pixel-events-w64-27k/predictions_026000.png": {
+    "bytes": 457539,
+    "sha256": "469f1c300b02122cc0dfbbb8cf192a40f58998502d81522035c17e783094bbe8"
+  },
+  "results/readiness/pixel-events-w64-27k/predictions_027000.png": {
+    "bytes": 457824,
+    "sha256": "b2d6998a5071a22cb2ff41189dd25f2ede888e55da8baba25b090af17a808392"
+  },
+  "results/readiness/pixel-events-w64-27k/source_at_run/motion_codes.py": {
+    "bytes": 2647,
+    "sha256": "8cd8c54b5a0c8c0586b69816d302529f94b9ab2864dcd171d5d0ef6d9175bd38"
+  },
+  "results/readiness/pixel-events-w64-27k/source_at_run/pixel_diffusion.py": {
+    "bytes": 9554,
+    "sha256": "8f6cc403293f747feac98ed32bdca697ee0613aa89bfbcf50401423cd1148954"
+  },
+  "results/readiness/pixel-events-w64-27k/source_at_run/residual_events.py": {
+    "bytes": 2126,
+    "sha256": "fccd41f991d5b749d40588fbf4edb34a18116b96243511c4183c11edd7b6cd32"
+  },
+  "results/readiness/pixel-events-w64-27k/source_at_run/train_pixel_dynamics.py": {
+    "bytes": 23406,
+    "sha256": "3ba2e7a7d78e1ca6deb25a7612208de177f19e0c390795d8c2a375134b824403"
+  },
+  "results/readiness/pixel-events-w64-27k/status.json": {
+    "bytes": 76,
+    "sha256": "ef404cf7da59ca64e01d9970b9568708824eb0d936ee2854dd1fe82cdc1ffddd"
+  },
+  "results/readiness/pixel-events-w64-27k/validation_starts.json": {
+    "bytes": 1792,
+    "sha256": "e213232b58029be36ac286eb8f493cebde44bb2d04fb1fdaf5abf642283ccd01"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/24.gif": {
+    "bytes": 1279784,
+    "sha256": "0460e32054d11a287f2eeb3862fcbd0139a36a35c29cb725d019855a4ba0c310"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/24.png": {
+    "bytes": 293544,
+    "sha256": "c98bd9a9df1dcb757d135465200e0991426c1d0934a4de16604592e9ae0dd47a"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/25.gif": {
+    "bytes": 1287285,
+    "sha256": "c8d49382127035540a819ffb70d66dc6bc59d03a5e1c6871a10e31152769e79b"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/25.png": {
+    "bytes": 294559,
+    "sha256": "8e8d7fc4d594007c2de03ae6086a024711ab614cdca3db92f9844575b313cabd"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/26.gif": {
+    "bytes": 1282654,
+    "sha256": "5d5aedc63b2d0f20f225d0de0bd3a0032980d49803089d38574f7f17e2f97d7c"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/26.png": {
+    "bytes": 293686,
+    "sha256": "5883e024b2a95761d4d7447df037bb7ff23f192ceb3117a6dda674cd80caaef5"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/27.gif": {
+    "bytes": 1285177,
+    "sha256": "85490c44e2cdc6f9584785337f7996508ae28542d7bff201e1297b08cfa747c8"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/27.png": {
+    "bytes": 294438,
+    "sha256": "5804728b6daae959b370af2954321d36b5379159cce5a93c082c90c742a9f952"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/oracle.gif": {
+    "bytes": 1189312,
+    "sha256": "9bbbbd5a70b58e4b2c4c058ed79a99974f6c95630df3b009f72cd89e184efbfd"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/oracle.png": {
+    "bytes": 285064,
+    "sha256": "834b470fa6c4bb2b7393e3c79d39407e0a14a213d891a10ba05687ab60cb9541"
+  },
+  "results/readiness/pixel-events-w64-27k-rollouts/results.json": {
+    "bytes": 92698,
+    "sha256": "4202547f47ad30abdfd41e9ef742982fd11d2170fe90de95fd420c738d1d1c78"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/config.json": {
+    "bytes": 1695,
+    "sha256": "8a328db0c646cd4cee32e31cd83d3d12727e7eeabe7987b0769e384ad75eda7d"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/ema_050000.pt": {
+    "bytes": 32422625,
+    "sha256": "6a4a78c4a4d89bc8991485ceaeb0dd777b15638fd972f9c38345f0340dd2f2d9"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/evaluation_030000.json": {
+    "bytes": 30353,
+    "sha256": "10eee7eef0db04c209a315906efdfc0682e77dda3b0d76d487e007f56afe7d79"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/evaluation_035000.json": {
+    "bytes": 30343,
+    "sha256": "e5abb193296be2b0469c71807f3816b4e4896c182667e072e0691f7d21012932"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/evaluation_040000.json": {
+    "bytes": 30317,
+    "sha256": "0c10092974fe3b8c590cfed72f835ca000c0d761ecc46269499947eb7e6ecfe4"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/evaluation_045000.json": {
+    "bytes": 30341,
+    "sha256": "db6b2600a5d0d6af770ac31691606f1ce98be3f4534ed7727a56c219e68f5f8e"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/evaluation_050000.json": {
+    "bytes": 30326,
+    "sha256": "f01bb107f05ef979e8d98b85a50287c34b6b8275734af12d17d2f23af5d24b3b"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_030000.json": {
+    "bytes": 21259,
+    "sha256": "b33086dca887ad61891833f9649f74349ae54998514f6bf222204ae5ddf59cf8"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_030000.png": {
+    "bytes": 372852,
+    "sha256": "0946139effd959fd827107761a80062929801bed9351ea916383a4577f6c8fd4"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_035000.json": {
+    "bytes": 21262,
+    "sha256": "6c8de8097dd7d874875e2d77ff7f7d3cfb74efc0225a396da8da6f994bea453b"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_035000.png": {
+    "bytes": 372846,
+    "sha256": "3adbd52eaa6623cb3fd7c2495eefa35a3dbacf5989915b8bc5f835bb6b376bd2"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_040000.json": {
+    "bytes": 21227,
+    "sha256": "d0c60a358a26f155c30a468b6a60ac68958d3f3f47501c5ccab74bd80a2335f8"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_040000.png": {
+    "bytes": 373323,
+    "sha256": "bcde22c732f689ec40820b237a9ff7721da7bc07067b0ed7360f47c2f7e78bde"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_045000.json": {
+    "bytes": 21243,
+    "sha256": "7b61bd37f2878a2328a6b9d4ace20e42249972dc65a0567d95059e99cf950925"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_045000.png": {
+    "bytes": 372987,
+    "sha256": "c912ee7d1a235b6f5e59dad04f19d1661b8a044097209fb27af5cbad2e5d1839"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_050000.json": {
+    "bytes": 21265,
+    "sha256": "f0c728137b6a03197a65652818afad044dca7c7eb981a23b2412e248c52c3c1c"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/interventions_050000.png": {
+    "bytes": 373403,
+    "sha256": "929808d830c65333321477b0248c0815417d16beb0de240c7b277b7dfe9abe28"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/last.pt": {
+    "bytes": 129678769,
+    "sha256": "92f9e98d25353f77b6b4aa18f9d47cc00676c0a989e81cee82152c394c7da7c1"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/metrics.jsonl": {
+    "bytes": 126768,
+    "sha256": "89258bd58547dca9e72881058455c793ed345b876a350a1f87a5303c59f8ad5d"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/predictions_030000.png": {
+    "bytes": 462996,
+    "sha256": "1e7c00f452e82346d1d343a4b8bbe6b3b417e0e7117da3bece7351a67cfca9d2"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/predictions_035000.png": {
+    "bytes": 463012,
+    "sha256": "02153b8a169c443f88a18da52d882b2dabfb8628e5b39be2cda45af21e0c687c"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/predictions_040000.png": {
+    "bytes": 463453,
+    "sha256": "0d2c88ae0ab85afe8adcd906060f5ca3db2c9ea8979f4ac56f2b470aef9dbf2b"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/predictions_045000.png": {
+    "bytes": 463273,
+    "sha256": "d89a8a7648055a0df1dbf0e9731442c295073176082508b4194d6bdd63d087bc"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/predictions_050000.png": {
+    "bytes": 463188,
+    "sha256": "bf53490ecc250aa5b366729ca75f6e1113d6ea26dfabcff9bad92a1f67200d69"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/source_at_run/motion_codes.py": {
+    "bytes": 2647,
+    "sha256": "8cd8c54b5a0c8c0586b69816d302529f94b9ab2864dcd171d5d0ef6d9175bd38"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/source_at_run/pixel_diffusion.py": {
+    "bytes": 9554,
+    "sha256": "8f6cc403293f747feac98ed32bdca697ee0613aa89bfbcf50401423cd1148954"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/source_at_run/train_pixel_dynamics.py": {
+    "bytes": 23406,
+    "sha256": "3ba2e7a7d78e1ca6deb25a7612208de177f19e0c390795d8c2a375134b824403"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/status.json": {
+    "bytes": 76,
+    "sha256": "c8e15997037c42a0afff73e79f2e23a4319f06e6754aca0c606acd1200f00a88"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k/validation_starts.json": {
+    "bytes": 448,
+    "sha256": "68bdef0f8e9a3ba77594f8f30b1495d98fc10b2c4a6e6076bd1e19ad50a9a8c6"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/0.gif": {
+    "bytes": 5067527,
+    "sha256": "03222abf0d4c373df9eea70c066a5e798a8f217ab1497d9cc8eb8321787cffc9"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/0.png": {
+    "bytes": 289153,
+    "sha256": "3abe7eabff44342914890c8369197d21e7f243ae2fb75b5440cdea0e1de09772"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/1.gif": {
+    "bytes": 4637835,
+    "sha256": "6cf512b6622b7dc3a240c02185285f4a5287fdd188150c5daa9f897d705bebc9"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/1.png": {
+    "bytes": 270520,
+    "sha256": "691c61b06ffd40f356e046d13a05f7d776b1aadad082f6421d09fd37ea36fe2f"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/2.gif": {
+    "bytes": 4474115,
+    "sha256": "631e34f862599840281e535aac48d102a8e8a2233c79deba17afa63545de4fb8"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/2.png": {
+    "bytes": 265686,
+    "sha256": "0dfc66800d6081fa51e140896f0932cc3cf3497e2d2ece25468921f8e75b6099"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/4.gif": {
+    "bytes": 4655348,
+    "sha256": "fb748702de4d70f0061930e4e0ecb9be43b322ffd2dd24bbd876fc21a28d55f3"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/4.png": {
+    "bytes": 277094,
+    "sha256": "6377b00b8643f1434f55c3d8654d5f4fb44746097c5df9ddb371582100ae83e4"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/5.gif": {
+    "bytes": 4711759,
+    "sha256": "d0a0b08976ace8882b0309eaa6207df80f5f59f1422749159b4a92c4e90aad42"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/5.png": {
+    "bytes": 275812,
+    "sha256": "17f23da3d0f2034f5bfd1da9f9cace2ee24b80ebd786fbe87dc1befed312a753"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/6.gif": {
+    "bytes": 4579395,
+    "sha256": "8b12bf005ff8706ecc941c88ae67359af05bebd233cf547151bd39a65165f5d9"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/6.png": {
+    "bytes": 284704,
+    "sha256": "61f83742b52d45098b89f3cec32fa85076756b71c96a02b57927da01b909518d"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/oracle.gif": {
+    "bytes": 4597056,
+    "sha256": "2f9812d0b7d05d5f7d459e2c8bd0caeebef3708a59550f410501bcdec1904d09"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/oracle.png": {
+    "bytes": 285598,
+    "sha256": "0679d7b08b6e110ebbf0c5db44e29bd8e77b440a34c9f1de9a76e9911a2af4a5"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/results.json": {
+    "bytes": 422398,
+    "sha256": "99daf27b95f5e8f26d718a37d8fa68356d36c40a7aa6b2f444a32d4aeda479f3"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/switch.gif": {
+    "bytes": 4484826,
+    "sha256": "9c668a72cb7dc264ec15e23a98863afee6f4de8e47dd1ca29a3ccf82df91f700"
+  },
+  "results/readiness/pixel-motion-w64-scaling-50k-rollouts/switch.png": {
+    "bytes": 279014,
+    "sha256": "985a81aeb1106683507e581060d659bde4ac085196ec7994c134f5c5c677e4cc"
+  }
+}

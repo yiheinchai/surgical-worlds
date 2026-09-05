@@ -1,0 +1,19 @@
+{
+  "instance_id": 49967727,
+  "destroy_response": {
+    "success": true
+  },
+  "reason": "User requested stop and wrap up",
+  "requested_at_utc": "2026-09-05T20:15:57.746195+00:00",
+  "instance_absent_verified": true,
+  "single_occurrence_cleanup_job_id": 714,
+  "cleanup_job_delete_status": 200,
+  "cleanup_job_delete_response": {
+    "success": true,
+    "msg": "Scheduled job 714 deleted successfully"
+  },
+  "reported_remaining_credit": 5.148591690119645,
+  "initial_authorized_credit": 8.6638506028,
+  "reported_credit_consumed": 3.5152589126803555,
+  "verified_at_utc": "2026-09-05T20:15:59.004146+00:00"
+}

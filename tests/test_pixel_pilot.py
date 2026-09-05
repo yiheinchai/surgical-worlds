@@ -405,3 +405,33 @@ def test_denoising_large_sigma_has_finite_gradients_and_reports_coverage():
     loss.backward()
     assert torch.isfinite(model.out[-1].weight.grad).all()
     assert model.out[-1].weight.grad.abs().max() > 0
+
+
+def test_training_rejects_evaluation_only_capture(tmp_path):
+    import h5py
+    from types import SimpleNamespace
+    from scripts.train_pixel_dynamics import Pilot
+
+    path = tmp_path / "evaluation.h5"
+    with h5py.File(path, "w") as f:
+        f.attrs["evaluation_only"] = True
+    args = SimpleNamespace(
+        output=str(tmp_path), name="blocked", seed=0, device="cpu", data=str(path)
+    )
+    with pytest.raises(ValueError, match="Evaluation-only"):
+        Pilot(args)
+
+
+def test_control_probe_heldout_labels_do_not_change_calibration():
+    from scripts.diagnostics.score_control_challenge import probe
+
+    features = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 0.0], [0.0, 1.0]])
+    labels = ["left", "right", "left", "right"]
+    episodes = [0, 1, 2, 3]
+    first = probe(features, labels, episodes, ["left", "right"])
+    second = probe(
+        features, labels[:2] + ["right", "left"], episodes, ["left", "right"]
+    )
+    assert first["calibration_centroids"] == second["calibration_centroids"]
+    assert first["test_predictions"] == second["test_predictions"]
+    assert first["accuracy"] == 1.0 and second["accuracy"] == 0.0

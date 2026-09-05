@@ -1,0 +1,9 @@
+{
+  "artifact_name": "picodoom-readiness-checkpoints-v3:v0",
+  "artifact_id": "QXJ0aWZhY3Q6MzUzMTMwMzYzOQ==",
+  "state": "COMMITTED",
+  "run_url": "https://wandb.ai/data2yihein-d/tinyworlds/runs/6l5m0joi",
+  "files": 104,
+  "bytes": 302810108,
+  "manifest_sha256": "b3e256476a5aae9decad630d82faa6eb5c975d6433c11d0a061099165242c6d8"
+}

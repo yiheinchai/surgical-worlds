@@ -37,6 +37,10 @@ class Pilot:
         torch.backends.cudnn.allow_tf32 = True
         self.device = torch.device(a.device)
         with h5py.File(a.data, "r") as f:
+            if f.attrs.get("evaluation_only", False):
+                raise ValueError(
+                    "Evaluation-only captures must never be used for training"
+                )
             self.data = torch.from_numpy(f["frames"][:])
         codes = np.load(a.codes)
         self.ids = torch.from_numpy(codes["ids"].astype(np.int64))
@@ -533,6 +537,9 @@ class Pilot:
                     self.checkpoint(step)
                     self.evaluate(step)
                     last = time.time()
+        except KeyboardInterrupt:
+            status = "user_stopped"
+            raise
         except Exception:
             status = "failed"
             raise

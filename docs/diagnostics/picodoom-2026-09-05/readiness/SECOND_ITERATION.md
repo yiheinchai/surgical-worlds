@@ -1,5 +1,7 @@
 # Samplers, generated histories, and sparse events
 
+**Stopped at the user's request. See [the final handoff](USER_STOP_HANDOFF.md).**
+
 This is a development investigation, not a claim of playable PicoDoom or approval
 of a full run. All training still uses RGB and train-fitted unsupervised controls.
 

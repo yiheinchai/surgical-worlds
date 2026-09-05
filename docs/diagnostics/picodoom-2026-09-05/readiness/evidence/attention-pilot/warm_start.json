@@ -1,0 +1,8 @@
+{
+  "source": "results/readiness/pixel-width64-euler3-context8-25k/last.pt",
+  "source_sha256": "7e7666d77b0b962846ef72633b36659ce8f45ccbeeb7273112afdf41cb762416",
+  "step": 25000,
+  "change": "One zero-output residual spatial attention block at the 16x16 bottleneck",
+  "retained": "All existing weights, EMA, AdamW moments, and saved training RNG state",
+  "new_optimizer_state": "Attention parameters start with empty AdamW moments"
+}

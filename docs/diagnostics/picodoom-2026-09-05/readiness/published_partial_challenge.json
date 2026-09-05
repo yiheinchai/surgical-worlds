@@ -1,0 +1,10 @@
+{
+  "artifact_name": "picodoom-evaluation-only-controls-partial:v0",
+  "artifact_id": "QXJ0aWZhY3Q6MzUzMTUwODMxOA==",
+  "state": "COMMITTED",
+  "run_url": "https://wandb.ai/data2yihein-d/tinyworlds/runs/z9bqol75",
+  "NOT_FOR_TRAINING": true,
+  "completed_episodes": 3,
+  "planned_episodes": 4,
+  "scoring_performed": false
+}

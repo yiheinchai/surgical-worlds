@@ -1,5 +1,7 @@
 # Readiness progress — investigation remains active
 
+**Stopped at the user's request. See [the final handoff](USER_STOP_HANDOFF.md).**
+
 The previous campaign diagnosed failure; it did not justify a full playable-game
 training run. This continuation has improved one-step generation and identified a
 useful error-recovery mechanism, but direct long-horizon control remains inadequate.

@@ -8,6 +8,11 @@ This branch starts from the actual PicoDoom experiment branch, commit `22b7aefa6
 
 ## Read first
 
+The latest user request stopped the investigation. Read
+[`USER_STOP_HANDOFF.md`](diagnostics/picodoom-2026-09-05/readiness/USER_STOP_HANDOFF.md)
+before the older plans below. Do not resume experiments or paid compute without
+a new user request. The readiness objective was not achieved.
+
 The user subsequently authorized continued small GPU experiments within the
 remaining Vast credit to establish full-run readiness. The active continuation is
 documented in [`readiness/PROGRESS.md`](diagnostics/picodoom-2026-09-05/readiness/PROGRESS.md)

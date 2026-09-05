@@ -1,5 +1,7 @@
 # Readiness investigation (continuation)
 
+**Stopped at the user's request. See [the final handoff](USER_STOP_HANDOFF.md).**
+
 The user explicitly requested continued iteration until a larger video-only run
 is justified for playable PicoDoom. The previous bounded campaign established
 failure modes, not readiness. The remaining authorized credit was $7.4224284.
