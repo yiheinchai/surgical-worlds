@@ -149,7 +149,10 @@ class Experiment:
             self.model=self.dyn
         self.optimizer=torch.optim.AdamW(self.model.parameters(),lr=args.lr,weight_decay=.01)
         if self.wandb:
-            self.run.watch(self.model, log='all', log_freq=max(args.log_every, 100))
+            # LAM training calls encoder/decoder directly to separate loss terms.
+            # Watching only their parent misses parameter forward hooks.
+            watched = [self.lam.encoder, self.lam.decoder] if args.stage == 'lam' else self.model
+            self.run.watch(watched, log='all', log_freq=max(args.log_every, 100))
         self.generator=torch.Generator().manual_seed(args.seed+100)
         self.log({'parameters':sum(p.numel() for p in self.model.parameters()),
                   'train_clips':len(self.starts['train']), 'device_name':torch.cuda.get_device_name() if self.device.type=='cuda' else 'cpu'},0)
