@@ -29,11 +29,13 @@ def main():
         tokens = vt.tokenize(video)
         latents = vt.quantizer.get_latents_from_indices(tokens)
         actions = lam.encode(video)
-    logits, mask, loss = dyn(latents, targets=tokens, conditioning=actions)
+    logits, mask, loss = dyn(latents, targets=tokens, conditioning=actions,
+                             objective_mode="next_frame")
     loss.backward()
     assert recon.shape == video.shape
     assert prediction.shape == video[:, 1:].shape
     assert logits.shape == (*tokens.shape, 64)
+    assert mask[:, -1].all() and not mask[:, :-1].any()
     assert torch.isfinite(torch.stack([vt_loss, lam_loss, loss])).all()
     assert any(p.grad is not None and p.grad.abs().sum() > 0 for p in dyn.parameters())
     dyn.eval()

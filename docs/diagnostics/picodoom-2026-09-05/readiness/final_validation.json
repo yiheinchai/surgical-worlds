@@ -1,0 +1,24 @@
+{
+  "full_suite": {
+    "passed": 30,
+    "seconds": 202.15,
+    "command": "WANDB_MODE=disabled OMP_NUM_THREADS=2 .venv/bin/python -m pytest -q"
+  },
+  "final_targeted_checks": {
+    "passed": 2,
+    "deselected": 14,
+    "seconds": 479.5,
+    "filter": "evaluation_only or control_probe",
+    "meaning": "Evaluation-only datasets rejected by training; held-out labels cannot change the diagnostic calibration or predictions"
+  },
+  "compileall": "passed",
+  "git_diff_check": "passed",
+  "compact_recovery": {
+    "files": 50,
+    "bytes": 474785,
+    "sha256": "be15e2acaac05d9af196fefbe50927198af325d7d676d808e5e4e70e0dc69473",
+    "all_member_hashes_verified": true
+  },
+  "interrupted_attention_step": 32596,
+  "new_experiments_after_stop": 0
+}

@@ -1,0 +1,87 @@
+{
+  "credential_scan_files": 504,
+  "credential_matches": 0,
+  "final_weights": {
+    "dynamics_legacy_reference_s0": {
+      "sha256": "272f342e19e35fa3f2246e2a2cbb9ce04dd20ae85ae53232d1e753adba4a202e",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "dynamics_legacy_reference_s1": {
+      "sha256": "f3ae1653c97a9d0548ad31802b91a17ecaa8ac0eb9c45544111aa3eb786bacd7",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "dynamics_next_frame_5000_s0": {
+      "sha256": "8a3f6d40a945a430affa2c4f97be16d7082d404cbdc776fe15e7d34e2a91ea62",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "dynamics_next_frame_s0": {
+      "sha256": "d4319892b77989fb2f09d69c52939858ebda2fbcca06f0a5cafecc1798be95b4",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "dynamics_next_frame_s1": {
+      "sha256": "4b67f12abd17c5185842a31bd3b9b3edbeb1e2c2593596c12f76bd49e40b0b99",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_benchmark_100": {
+      "sha256": "da05eaa68420c6d4a57d1597863c0405f424aa0110d6ed8ef531f26e8b5b9e72",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_information_5000_s0": {
+      "sha256": "3d3ac3bcb3a3ed57c812b649a00fd246d383855087a9f456467039402bb1b405",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_information_s0": {
+      "sha256": "76dd7096fc1bdd47eacc78714e5f8ee88eeb9d0048b74d089864431e31425cba",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_information_s1": {
+      "sha256": "2a43d2ce7aef6e2bebd314753cf3d280f45949a352d227cf760f9881a0ce2368",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_reference_5000_s0": {
+      "sha256": "41f9c9505ba38f21d41e56269932b53a540afca139ce0962b8708d86986d9989",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_reference_s0": {
+      "sha256": "70c4e8e040b8784125cf87d120bcd00b1faaef98ebfe51a34ce95a178f291264",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "lam_pair_reference_s1": {
+      "sha256": "b963793ac382b06871389aef39e2a9d4d10c17c73705537488042ec2ab66e1b9",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "synthetic_branched_information": {
+      "sha256": "8d4bf3c1bdf7e5ef3016a5a0ffc7face48b09b636d9c729f5b0ccfc5215c0e3c",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "synthetic_branched_reference": {
+      "sha256": "a281fefb8d208d09b3d4cc31c8f14cb0cf7c2fdcb38afa9d7307deaf7ff78ab3",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "synthetic_scratch_information": {
+      "sha256": "8159b454bd93b71beb69d3198da15fa7f7a0de4d0f74ef89c004230de880a3ab",
+      "strict_load": true,
+      "all_tensors_finite": true
+    },
+    "synthetic_scratch_reference": {
+      "sha256": "d2e49975407dec67ade7e431425938be6b48601b6b9f571300ed13245230a32d",
+      "strict_load": true,
+      "all_tensors_finite": true
+    }
+  },
+  "scratch_and_checkpoint_trained_weights_differ": true
+}

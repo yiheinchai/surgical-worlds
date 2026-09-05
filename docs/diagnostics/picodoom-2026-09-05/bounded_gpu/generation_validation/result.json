@@ -1,0 +1,8 @@
+{
+  "status": "completed_evaluation",
+  "models_completed": [
+    "original",
+    "next1000",
+    "next5000"
+  ]
+}

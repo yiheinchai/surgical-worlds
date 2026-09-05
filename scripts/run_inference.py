@@ -124,10 +124,11 @@ def main():
             next_video_latents = dynamics_model.forward_inference(
                 context_latents=video_latents,
                 prediction_horizon=args.prediction_horizon,
-                num_steps=10,
+                num_steps=args.maskgit_steps,
                 index_to_latents_fn=idx_to_latents,
                 conditioning=action_latent,
                 temperature=args.temperature,
+                decoding_mode=args.decoding_mode,
             )
 
         # decode next video tokens to frames

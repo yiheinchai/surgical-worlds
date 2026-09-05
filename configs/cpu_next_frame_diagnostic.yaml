@@ -1,0 +1,8 @@
+# Reference settings for scripts/cpu_next_frame_diagnostic.py. Synthetic video only.
+device: cpu
+seed: 23
+updates: 12
+frame_size: 16
+context_length: 3
+objective_mode: next_frame
+decoding_steps: 2

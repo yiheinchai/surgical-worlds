@@ -11,6 +11,7 @@ from utils.wandb_utils import (
     init_wandb, log_training_metrics, log_learning_rate, log_system_metrics, finish_wandb, log_action_distribution
 )
 from utils.eval_utils import mean_loader_loss
+from utils.training_utils import MicrobatchLossMean
 from utils.scheduler_utils import create_cosine_scheduler
 from utils.utils import (
     readable_timestamp,
@@ -159,6 +160,7 @@ def main():
     val_batches = int(os.environ.get('WANDB_VAL_BATCHES', '4'))
 
     for i in tqdm(range(0, args.n_updates), disable=not is_main):
+        loss_meter = MicrobatchLossMean(args.gradient_accumulation_steps)
         for opt in optimizers:
             opt.zero_grad(set_to_none=True)
         if isinstance(dynamics_model, FSDPModule):
@@ -185,7 +187,8 @@ def main():
             # predict masked frame latents with dynamics model (masking in dynamics model)
             with train_ctx:
                 predicted_next_logits, mask_positions, loss = dynamics_model(
-                    video_latents, training=True, conditioning=quantized_actions, targets=video_tokens
+                    video_latents, training=True, conditioning=quantized_actions, targets=video_tokens,
+                    objective_mode=args.objective_mode,
                 )
 
                 # add MoE load-balancing auxiliary loss
@@ -199,12 +202,13 @@ def main():
                     if (micro_batch + 1) % args.gradient_accumulation_steps == 0:
                         dynamics_model.set_requires_gradient_sync(True)
 
-                loss /= args.gradient_accumulation_steps
-                loss.backward()
+                loss_meter.backward_loss(loss).backward()
+
+        train_loss = loss_meter.mean
 
         results['n_updates'] = i
-        results['dynamics_losses'].append(loss.detach().cpu())
-        results['loss_vals'].append(loss.detach().cpu())
+        results['dynamics_losses'].append(train_loss)
+        results['loss_vals'].append(train_loss)
 
         torch.nn.utils.clip_grad_norm_(unwrap_model(dynamics_model).parameters(), max_norm=1.0)
         for opt in optimizers:
@@ -214,7 +218,7 @@ def main():
 
         # wandb logging
         if args.use_wandb and is_main:
-            log_dict = {'train/loss': loss.item(), 'step': i}
+            log_dict = {'train/loss': train_loss, 'step': i}
             if use_moe:
                 log_dict['train/moe_aux_loss'] = moe_aux_scalar
                 # per-expert utilization across blocks
@@ -261,7 +265,8 @@ def main():
                         actions = latent_action_model.encode(batch) if args.use_actions else None
                         with train_ctx:
                             _, _, vloss = unwrap_model(dynamics_model)(
-                                latents, training=True, conditioning=actions, targets=tokens
+                                latents, training=True, conditioning=actions, targets=tokens,
+                                objective_mode=args.objective_mode,
                             )
                         return vloss
                     val_loss = mean_loader_loss(_dyn_val_step, validation_loader, args.device, n_batches=val_batches)
@@ -286,7 +291,8 @@ def main():
                 save_path = os.path.join(visualizations_dir, f'dynamics_prediction_step_{i}.png')
                 visualize_reconstruction(masked_frames[:16].cpu(), predicted_frames[:16].cpu(), save_path)
 
-                print('\n Step', i, 'Loss:', torch.mean(torch.stack(results["loss_vals"][-args.log_interval:])).item())
+                recent = results["loss_vals"][-args.log_interval:]
+                print('\n Step', i, 'Loss:', sum(recent) / len(recent))
 
     # finish wandb
     if args.use_wandb and is_main:

@@ -1,0 +1,9 @@
+{
+  "artifact_name": "picodoom-readiness-user-stop:v0",
+  "artifact_id": "QXJ0aWZhY3Q6MzUzMTQyMjAyMA==",
+  "state": "COMMITTED",
+  "run_url": "https://wandb.ai/data2yihein-d/tinyworlds/runs/zgfq8z80",
+  "files": 15,
+  "bytes": 168393739,
+  "manifest_sha256": "7afd7da243f4c8bd59cf3e8f5a161ea0acddf68cde05fc6d9ae133e3ed8f8c75"
+}

@@ -30,6 +30,7 @@ def _load_video_dataset_pair(dataset_cls, video_rel_path, h5_rel_path, num_frame
     video_path = current_folder_path + video_rel_path
     preprocessed_path = current_folder_path + h5_rel_path
     transform = _default_video_transform() if transform is None else transform
+    kwargs.setdefault("split_policy", "temporal_disjoint")
 
     train = dataset_cls(
         video_path,

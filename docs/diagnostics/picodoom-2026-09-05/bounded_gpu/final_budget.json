@@ -1,0 +1,30 @@
+{
+  "checked_at_utc": "2026-09-05T13:12:25.176501+00:00",
+  "initial_credit_usd": 8.663850602839517,
+  "remaining_credit_usd": 7.422428387509569,
+  "spent_since_start_usd": 1.2414222153299477,
+  "authorized_credit_usd": 8.66,
+  "tranche_cap_usd": 2,
+  "quote_usd_per_hour": 0.32342592592592595,
+  "destroyed_instance_ids": [
+    49945749,
+    49945816,
+    49946781
+  ],
+  "all_task_instances_absent": true,
+  "cleanup_job_708_deleted": true,
+  "no_funds_added": true,
+  "billing_note": "Balance difference after deletion; may include setup, disk, transfer, idle time and provider billing settlement.",
+  "settlement_recheck_utc": "2026-09-05T13:23:45.066714+00:00",
+  "settlement_recheck_credit_usd": 7.422428387509569,
+  "settlement_recheck_spent_usd": 1.2414222153299477,
+  "cleanup_job_recheck_http_status": 404,
+  "cleanup_job_recheck_response": {
+    "success": false,
+    "error": "not_found",
+    "msg": "No scheduled job found with ID 708."
+  },
+  "remaining_task_instance_count": 0,
+  "first_post_deletion_remaining_credit_usd": 7.432404355509561,
+  "first_post_deletion_spent_usd": 1.2314462473299557
+}

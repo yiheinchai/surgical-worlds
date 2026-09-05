@@ -1,0 +1,86 @@
+[
+  {
+    "run_name": "lam_pair_information_5000_s0",
+    "id": "n08xj1yd",
+    "returncode": 0,
+    "seconds": 73.22286687500309
+  },
+  {
+    "run_name": "dynamics_next_frame_5000_s0",
+    "id": "ye65fsqa",
+    "returncode": 0,
+    "seconds": 206.39875154200126
+  },
+  {
+    "run_name": "synthetic_branched_information",
+    "id": "koi55py0",
+    "returncode": 0,
+    "seconds": 40.900823541000136
+  },
+  {
+    "run_name": "action_semantics_5000_validation",
+    "id": "bwmrvv8e",
+    "returncode": 0,
+    "seconds": 14.985859791995608
+  },
+  {
+    "run_name": "generation_validation",
+    "id": "kvzabm0o",
+    "returncode": 0,
+    "seconds": 63.942599458001496
+  },
+  {
+    "run_name": "dynamics_legacy_reference_s1",
+    "id": "yg96tj3k",
+    "returncode": 0,
+    "seconds": 46.93466904100205
+  },
+  {
+    "run_name": "dynamics_next_frame_s1",
+    "id": "xza73yu6",
+    "returncode": 0,
+    "seconds": 37.945715833004215
+  },
+  {
+    "run_name": "final_test_lam_reference_5000",
+    "id": "my9b0iw2",
+    "returncode": 0,
+    "seconds": 15.82693825000024
+  },
+  {
+    "run_name": "final_test_lam_information_5000",
+    "id": "7zp7iydp",
+    "returncode": 0,
+    "seconds": 16.76638866700523
+  },
+  {
+    "run_name": "final_test_dynamics_original",
+    "id": "ov2qasle",
+    "returncode": 0,
+    "seconds": 22.06401958400238
+  },
+  {
+    "run_name": "final_test_dynamics_next5000",
+    "id": "01a2bfri",
+    "returncode": 0,
+    "seconds": 26.980139709005016
+  },
+  {
+    "run_name": "synthetic_scratch_reference",
+    "id": "hpw0k7vh",
+    "returncode": 0,
+    "seconds": 53.584128875001625
+  },
+  {
+    "run_name": "synthetic_scratch_information",
+    "id": "j13mur8x",
+    "returncode": 0,
+    "seconds": 42.735369624999294
+  },
+  {
+    "run_name": "synthetic_scratch_code_semantics",
+    "id": "2kh4rem2",
+    "returncode": 0,
+    "seconds": 9.950652749997971
+  }
+]

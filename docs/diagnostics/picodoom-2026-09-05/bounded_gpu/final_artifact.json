@@ -1,0 +1,12 @@
+{
+  "name": "bounded-investigation-reviewed-evidence:v0",
+  "id": "QXJ0aWZhY3Q6MzUyNzQwNzU3OA==",
+  "type": "research-evidence",
+  "state": "COMMITTED",
+  "findings_url": "https://wandb.ai/data2yihein-d/tinyworlds/runs/1jbhbcyr",
+  "api_verified_state": "COMMITTED",
+  "findings_state": "finished",
+  "findings_experiment_table_rows": 20,
+  "findings_has_motion_control_table": true,
+  "findings_has_rollout_comparison": true
+}

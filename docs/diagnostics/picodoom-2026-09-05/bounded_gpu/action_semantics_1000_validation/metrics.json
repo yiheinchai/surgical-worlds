@@ -1,0 +1,90 @@
+{
+  "reference": {
+    "uniform_color_fraction_of_code_change": 0.9403457045555115,
+    "same_frame_pair_code_agreement": 0.9765625,
+    "majority_code_fraction": 0.9765625,
+    "code_explained_fraction/previous_brightness": 0.013491801669705428,
+    "code_explained_fraction/brightness_delta": 0.5165558850963654,
+    "code_explained_fraction/median_flow_x": 0.002647578716278076,
+    "code_explained_fraction/median_flow_y": 0.002871274948120117,
+    "code_explained_fraction/mean_flow_magnitude": 0.0030554533004760742,
+    "per_code": {
+      "0": {
+        "count": 125,
+        "mean_previous_brightness": 0.23420051828022875,
+        "mean_brightness_delta": 0.0008978681576797386,
+        "mean_median_flow_x": 0.011824828572571278,
+        "mean_median_flow_y": -0.08076300472021103,
+        "mean_mean_flow_magnitude": 2.2018003463745117
+      },
+      "1": {
+        "count": 3,
+        "mean_previous_brightness": 0.28744159773284317,
+        "mean_brightness_delta": -0.11511693218954248,
+        "mean_median_flow_x": -0.6833236217498779,
+        "mean_median_flow_y": 0.07699059695005417,
+        "mean_mean_flow_magnitude": 1.706685185432434
+      },
+      "2": {
+        "count": 0,
+        "mean_previous_brightness": null,
+        "mean_brightness_delta": null,
+        "mean_median_flow_x": null,
+        "mean_median_flow_y": null,
+        "mean_mean_flow_magnitude": null
+      },
+      "3": {
+        "count": 0,
+        "mean_previous_brightness": null,
+        "mean_brightness_delta": null,
+        "mean_median_flow_x": null,
+        "mean_median_flow_y": null,
+        "mean_mean_flow_magnitude": null
+      }
+    }
+  },
+  "information": {
+    "uniform_color_fraction_of_code_change": 0.8788261413574219,
+    "same_frame_pair_code_agreement": 0.890625,
+    "majority_code_fraction": 0.3828125,
+    "code_explained_fraction/previous_brightness": 0.6395004911126378,
+    "code_explained_fraction/brightness_delta": 0.009574708600646353,
+    "code_explained_fraction/median_flow_x": 0.0021096467971801758,
+    "code_explained_fraction/median_flow_y": 0.044154584407806396,
+    "code_explained_fraction/mean_flow_magnitude": 0.008767127990722656,
+    "per_code": {
+      "0": {
+        "count": 48,
+        "mean_previous_brightness": 0.25502521456716365,
+        "mean_brightness_delta": 0.00018188210614106755,
+        "mean_median_flow_x": 0.019014587625861168,
+        "mean_median_flow_y": -0.059905704110860825,
+        "mean_mean_flow_magnitude": 2.034193277359009
+      },
+      "1": {
+        "count": 49,
+        "mean_previous_brightness": 0.1700356184140323,
+        "mean_brightness_delta": -0.004851510916866747,
+        "mean_median_flow_x": -0.11121724545955658,
+        "mean_median_flow_y": 0.005847460124641657,
+        "mean_mean_flow_magnitude": 2.244870185852051
+      },
+      "2": {
+        "count": 31,
+        "mean_previous_brightness": 0.3085301282811512,
+        "mean_brightness_delta": -0.0001330188073213157,
+        "mean_median_flow_x": 0.1279057264328003,
+        "mean_median_flow_y": -0.23469208180904388,
+        "mean_mean_flow_magnitude": 2.3453292846679688
+      },
+      "3": {
+        "count": 0,
+        "mean_previous_brightness": null,
+        "mean_brightness_delta": null,
+        "mean_median_flow_x": null,
+        "mean_median_flow_y": null,
+        "mean_mean_flow_magnitude": null
+      }
+    }
+  }
+}

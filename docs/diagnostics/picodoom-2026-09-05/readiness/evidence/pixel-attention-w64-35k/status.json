@@ -1,0 +1,7 @@
+{
+  "status": "user_stopped",
+  "step": 32596,
+  "elapsed_seconds": 794.5708005428314,
+  "status_at_interrupt_before_correction": "finished",
+  "reason": "User requested stop and wrap up before the planned 35000 updates and rollout evaluation"
+}

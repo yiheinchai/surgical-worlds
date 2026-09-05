@@ -2,7 +2,10 @@
 
 The strongest evidence points to a mismatch between the prediction task used for training and the task required for generation, alongside weak discrete action learning. More training on the current recipe is a poor next experiment. The existing train/validation interpretation also needs correction.
 
-This is an investigation record, not a retraining result. No training implementation was changed and no cloud training was launched.
+This section records the initial audit before implementation and retraining.
+The subsequent [bounded GPU investigation](BOUNDED_GPU_REPORT.md) records the
+implemented fixes, matched retraining experiments, live W&B artifacts, and
+remaining blockers. Its results supersede this audit's implementation status.
 
 **User requirement:** keep training unsupervised and video-only, as in DeepMind's Genie. The experiment plan below uses no action labels or robot telemetry as training supervision.
 
@@ -103,6 +106,41 @@ The current UI's fixed labels such as “grasp” or “left” do not establish
 6. **Return to surgical video with the same criteria.** Preserve episode boundaries and verify motion survives preprocessing and tokenization. Evaluate image quality, target prediction, and cross-scene action consistency separately. Unsupervised codes need not initially map to the named controls in the UI.
 
 The intended milestone is a video-only model whose inferred discrete actions measurably improve prediction of fully hidden next frames and produce consistent interventions. A longer run of the existing pipeline cannot distinguish which part is preventing that milestone.
+
+## Cloud implementation validation (5 September 2026)
+
+The first cloud task is now implemented without adding action labels. Game-video
+factories use a contiguous temporal train/validation partition whose source frames
+are disjoint. Dynamics defaults to clean causal history plus a wholly hidden final
+frame and scores only that frame; `legacy_maskgit` remains selectable for old
+checkpoint comparisons. All three accumulated training stages now report the mean
+of the undivided microbatch losses rather than the scaled final microbatch.
+
+Commands run on CPU:
+
+```bash
+WANDB_MODE=disabled MPLBACKEND=Agg OMP_NUM_THREADS=2 .venv/bin/python scripts/codex_cloud_smoke.py
+WANDB_MODE=disabled MPLBACKEND=Agg OMP_NUM_THREADS=2 .venv/bin/python -m pytest -q
+WANDB_MODE=disabled MPLBACKEND=Agg OMP_NUM_THREADS=2 .venv/bin/python scripts/cpu_next_frame_diagnostic.py
+.venv/bin/python -m compileall -q datasets models scripts utils tests
+```
+
+The deterministic 12-update synthetic moving-square diagnostic reduced its tiny-set
+next-frame training CE from **1.1858 to 0.8532**. Full-target CE was 0.8345 with
+inferred actions, 0.8338 with one constant inferred code, and 0.8356 with shuffled
+inferred actions. One-step decoded L1 was 1.0197 for all three, while copying was
+0.0625. Partial-reconstruction CE is recorded separately in
+[`cpu_next_frame_diagnostic.json`](cpu_next_frame_diagnostic.json). This is a bounded
+implementation/gradient check with randomly initialized tokenizer and LAM, not a
+generalization result. In particular, it correctly provides **no evidence of useful
+control**: action ablations are essentially tied and copying wins strongly.
+
+The next LAM experiment remains the isolated two-frame video-only ablation: infer a
+small discrete code from both frames, expose only the first frame and inferred code
+to the decoder, and predict the second. Evaluate on disjoint clips and require the
+inferred code to outperform fixed and shuffled codes in fidelity and motion-sensitive
+metrics before changing VQ, optimizer, model scale, or loss. No paid GPU run or
+recurring job was launched here.
 
 ## What to take from the linked reading
 

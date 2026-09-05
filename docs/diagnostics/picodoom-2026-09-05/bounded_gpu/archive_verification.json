@@ -1,0 +1,12 @@
+{
+  "all_results.tar.gz": {
+    "sha256": "3379a31d05f2d383cc36f636748b8729ff38cbb79138ea943a6bada61bbcd624",
+    "bytes": 133896911
+  },
+  "scratch_results.tar.gz": {
+    "sha256": "26f069b85ef59326e4e35a78ba7ab3a15a656dcf14aebe8aa393633991684a8f",
+    "bytes": 42376214
+  },
+  "completed_training_runs": 16,
+  "completed_gpu_optimizer_updates": 35100
+}

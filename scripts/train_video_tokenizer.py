@@ -11,6 +11,7 @@ from utils.config import VideoTokenizerConfig, load_stage_config_merged
 from utils.utils import save_training_state, load_videotokenizer_from_checkpoint
 from utils.wandb_utils import init_wandb, log_training_metrics, log_system_metrics, log_learning_rate, finish_wandb
 from utils.eval_utils import mean_loader_loss
+from utils.training_utils import MicrobatchLossMean
 from dataclasses import asdict
 from utils.distributed import init_distributed_from_env, prepare_model_for_distributed, unwrap_model, print_param_count_if_main, cleanup_distributed
 from torch.distributed.fsdp import FSDPModule
@@ -116,6 +117,7 @@ def main():
     train_iter = iter(training_loader)
     val_batches = int(os.environ.get('WANDB_VAL_BATCHES', '4'))
     for i in tqdm(range(args.n_updates), disable=not is_main):
+        loss_meter = MicrobatchLossMean(args.gradient_accumulation_steps)
         for opt in optimizers:
             opt.zero_grad(set_to_none=True)
         if isinstance(model, FSDPModule):
@@ -133,12 +135,13 @@ def main():
 
             with train_ctx:
                 loss, x_hat = model(x)
-                loss /= args.gradient_accumulation_steps
                 if isinstance(model, FSDPModule):
                     if (micro_batch + 1) % args.gradient_accumulation_steps == 0:
                         model.set_requires_gradient_sync(True)
 
-                loss.backward()
+                loss_meter.backward_loss(loss).backward()
+
+        train_loss = loss_meter.mean
 
         torch.nn.utils.clip_grad_norm_(unwrap_model(model).parameters(), max_norm=1.0)
         for opt in optimizers:
@@ -146,13 +149,13 @@ def main():
         for sched in schedulers:
             sched.step()
 
-        results["loss_vals"].append(loss.cpu().detach())
+        results["loss_vals"].append(train_loss)
         results["n_updates"] = i
 
         # wandb logging
         if args.use_wandb and is_main:
             metrics = {
-                'loss': loss.item(),
+                'loss': train_loss,
                 'learning_rate': schedulers[0].get_last_lr()[0],
             }
             log_training_metrics(i, metrics, prefix='train')
@@ -186,7 +189,8 @@ def main():
                 save_path = os.path.join(visualizations_dir, f'video_tokenizer_recon_step_{i}.png')
                 visualize_reconstruction(x_vis[:16], x_hat_vis[:16], save_path)
             
-                print('\n Step', i, 'Loss:', torch.mean(torch.stack(results["loss_vals"][-args.log_interval:])).item())
+                recent = results["loss_vals"][-args.log_interval:]
+                print('\n Step', i, 'Loss:', sum(recent) / len(recent))
 
     # finish wandb
     if args.use_wandb and is_main:
