@@ -16,6 +16,8 @@ class VideoHDF5Dataset(Dataset):
         save_path: Optional[str] = None,
         train: bool = True,
         disable_test_split: bool = True,
+        split_policy: Optional[str] = None,
+        validation_fraction: float = 0.1,
         num_frames: int = 4, # context length
         resize_to: Tuple[int, int] = (64, 64), 
         fps: int = 30,
@@ -64,9 +66,25 @@ class VideoHDF5Dataset(Dataset):
 
             self.data = frames
 
-        if not disable_test_split:
-            split_idx = int(0.9 * len(self.data))
-            self.data = self.data[:split_idx] if train else self.data[split_idx:]
+        # `disable_test_split` remains for old callers/checkpoints. New callers
+        # should name their policy; game factories use temporal_disjoint.
+        policy = split_policy or ("none" if disable_test_split else "temporal_disjoint")
+        if policy not in {"none", "temporal_disjoint"}:
+            raise ValueError(f"Unknown split_policy={policy!r}; expected 'none' or 'temporal_disjoint'")
+        if policy == "temporal_disjoint":
+            if not 0.0 < validation_fraction < 1.0:
+                raise ValueError("validation_fraction must be strictly between 0 and 1")
+            split_idx = int((1.0 - validation_fraction) * len(self.data))
+            partition = self.data[:split_idx] if train else self.data[split_idx:]
+            required = self.num_frames * self.frame_skip + 1
+            if len(partition) < required:
+                name = "training" if train else "validation"
+                raise ValueError(
+                    f"Temporal split produced an empty {name} window partition: "
+                    f"{len(partition)} source frames, but at least {required} are required. "
+                    "Increase preload_ratio or reduce num_frames/frame_skip."
+                )
+            self.data = partition
 
     def _preprocess_video(
         self,
@@ -140,7 +158,7 @@ class VideoHDF5Dataset(Dataset):
 
 # TODO: add more datasets
 class PongDataset(VideoHDF5Dataset):
-    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=1, resolution=(64, 64), fps=30, preload_ratio=1):
+    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=1, resolution=(64, 64), fps=30, preload_ratio=1, **kwargs):
         super().__init__(
             video_path=video_path,
             transform=transform,
@@ -154,10 +172,11 @@ class PongDataset(VideoHDF5Dataset):
             load_start_index=0,
             preprocess_read_step=10,  # keep every 10th frame from raw
             preprocess_slice=None,
+            **kwargs,
         )
 
 class PolePositionDataset(VideoHDF5Dataset):
-    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(64, 64), fps=30, preload_ratio=1):
+    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(64, 64), fps=30, preload_ratio=1, **kwargs):
         super().__init__(
             video_path=video_path,
             transform=transform,
@@ -172,10 +191,11 @@ class PolePositionDataset(VideoHDF5Dataset):
             load_start_index=0,
             preprocess_read_step=1,
             preprocess_slice=(1/50, 1/4),
+            **kwargs,
         )
 
 class SonicDataset(VideoHDF5Dataset):
-    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=15, preload_ratio=1):
+    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=15, preload_ratio=1, **kwargs):
         super().__init__(
             video_path=video_path,
             transform=transform,
@@ -190,10 +210,11 @@ class SonicDataset(VideoHDF5Dataset):
             load_start_index=100,
             preprocess_read_step=1,
             preprocess_slice=None,
+            **kwargs,
         )
 
 class PicoDoomDataset(VideoHDF5Dataset):
-    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=30, preload_ratio=0.3):
+    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=30, preload_ratio=0.3, **kwargs):
         super().__init__(
             video_path=video_path,
             transform=transform,
@@ -208,10 +229,11 @@ class PicoDoomDataset(VideoHDF5Dataset):
             load_start_index=300,
             preprocess_read_step=1,
             preprocess_slice=None,
+            **kwargs,
         )
 
 class ZeldaDataset(VideoHDF5Dataset):
-    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=15, preload_ratio=0.2):
+    def __init__(self, video_path, transform=None, save_path=None, train=True, num_frames=4, resolution=(128, 128), fps=15, preload_ratio=0.2, **kwargs):
         super().__init__(
             video_path=video_path,
             transform=transform,
@@ -226,4 +248,5 @@ class ZeldaDataset(VideoHDF5Dataset):
             load_start_index=1000,
             preprocess_read_step=1,
             preprocess_slice=None,
+            **kwargs,
         )
