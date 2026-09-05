@@ -8,6 +8,14 @@ This branch starts from the actual PicoDoom experiment branch, commit `22b7aefa6
 
 ## Read first
 
+The user subsequently authorized continued small GPU experiments within the
+remaining Vast credit to establish full-run readiness. The active continuation is
+documented in [`readiness/PROGRESS.md`](diagnostics/picodoom-2026-09-05/readiness/PROGRESS.md)
+and [`readiness/PLAN.md`](diagnostics/picodoom-2026-09-05/readiness/PLAN.md).
+It is still an investigation: improved one-step motion and sharper rollouts do
+not establish sustained control or a playable game. Read these newer records
+before interpreting the previous campaign's stopping point as the current task.
+
 The first cloud implementation is now recovered and committed separately. The
 subsequent user-authorized bounded GPU investigation is documented in
 [`BOUNDED_GPU_REPORT.md`](diagnostics/picodoom-2026-09-05/BOUNDED_GPU_REPORT.md),
