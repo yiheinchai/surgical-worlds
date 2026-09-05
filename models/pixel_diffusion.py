@@ -52,6 +52,35 @@ class Block(nn.Module):
         return (self.skip(x) + h) / math.sqrt(2)
 
 
+class SpatialAttention(nn.Module):
+    """Global spatial mixing with an initially identity residual path."""
+
+    def __init__(self, channels, heads=4):
+        super().__init__()
+        self.heads = heads
+        self.norm = nn.GroupNorm(8, channels)
+        self.qkv = nn.Conv2d(channels, channels * 3, 1)
+        self.proj = nn.Conv2d(channels, channels, 1)
+        nn.init.zeros_(self.proj.weight)
+        nn.init.zeros_(self.proj.bias)
+
+    def forward(self, x):
+        b, c, h, w = x.shape
+        q, k, v = (
+            self.qkv(self.norm(x))
+            .reshape(b, 3, self.heads, c // self.heads, h * w)
+            .unbind(1)
+        )
+        z = (
+            F.scaled_dot_product_attention(
+                q.transpose(-2, -1), k.transpose(-2, -1), v.transpose(-2, -1)
+            )
+            .transpose(-2, -1)
+            .reshape(b, c, h, w)
+        )
+        return x + self.proj(z)
+
+
 class PixelDenoiser(nn.Module):
     def __init__(
         self,
@@ -62,6 +91,10 @@ class PixelDenoiser(nn.Module):
         prediction_mode="frame",
         motion_centers=None,
         noise_features="legacy",
+        event_count=1,
+        use_event_prior=False,
+        event_prior=None,
+        bottleneck_attention=False,
     ):
         super().__init__()
         self.codes = codes
@@ -70,6 +103,22 @@ class PixelDenoiser(nn.Module):
         self.offset_noise = offset_noise
         self.prediction_mode = prediction_mode
         self.noise_features = noise_features
+        self.bottleneck_attention = bottleneck_attention
+        if event_count < 1 or codes % event_count:
+            raise ValueError("codes must be divisible by event_count")
+        self.event_count = event_count
+        self.use_event_prior = use_event_prior
+        if use_event_prior:
+            prior = (
+                torch.zeros(event_count, 3, 64, 64)
+                if event_prior is None
+                else torch.as_tensor(event_prior, dtype=torch.float32)
+            )
+            if prior.ndim != 4 or tuple(prior.shape[:2]) != (event_count, 3):
+                raise ValueError(
+                    "event_prior must have shape [event_count, 3, height, width]"
+                )
+            self.register_buffer("event_prior", prior)
         em = width * 4
         if prediction_mode == "warp_residual":
             if motion_centers is None:
@@ -99,8 +148,11 @@ class PixelDenoiser(nn.Module):
         self.time = nn.Sequential(
             nn.Linear(64 + history, em), nn.SiLU(), nn.Linear(em, em)
         )
+        action_features = (
+            codes if event_count == 1 else codes // event_count + event_count
+        )
         self.actions = nn.Sequential(
-            nn.Linear(codes * history, em), nn.SiLU(), nn.Linear(em, em)
+            nn.Linear(action_features * history, em), nn.SiLU(), nn.Linear(em, em)
         )
         self.input = nn.Conv2d(3 * (history + 1), width, 3, padding=1)
         self.b0 = nn.ModuleList([Block(width, width, em) for _ in range(2)])
@@ -118,11 +170,28 @@ class PixelDenoiser(nn.Module):
         )
         nn.init.zeros_(self.out[-1].weight)
         nn.init.zeros_(self.out[-1].bias)
+        # Register last to retain the original optimizer parameter ordering.
+        if bottleneck_attention:
+            self.spatial_attention = SpatialAttention(width * 4)
 
     def prediction_base(self, history, actions):
         if self.prediction_mode == "frame":
-            return torch.zeros_like(history[:, -1])
-        return warp_frame(history[:, -1], self.motion_centers[actions[:, -1]])
+            base = torch.zeros_like(history[:, -1])
+        else:
+            base = warp_frame(history[:, -1], self.motion_centers[actions[:, -1]])
+        if self.use_event_prior:
+            prior = self.event_prior[actions[:, -1] % self.event_count]
+            base = base + F.interpolate(
+                prior, size=base.shape[-2:], mode="bilinear", align_corners=False
+            )
+        return base
+
+    def action_features(self, actions):
+        if self.event_count == 1:
+            return F.one_hot(actions, self.codes).float().flatten(1)
+        motion = F.one_hot(actions // self.event_count, self.codes // self.event_count)
+        event = F.one_hot(actions % self.event_count, self.event_count)
+        return torch.cat([motion, event], dim=-1).float().flatten(1)
 
     def forward(self, noisy, sigma, history, actions, history_noise=None):
         base = self.prediction_base(history, actions)
@@ -136,7 +205,7 @@ class PixelDenoiser(nn.Module):
         ang = sigma.log()[:, None] / 4 * self.frequencies[None]
         e = self.time(
             torch.cat([ang.cos(), ang.sin(), history_noise], -1)
-        ) + self.actions(F.one_hot(actions, self.codes).float().flatten(1))
+        ) + self.actions(self.action_features(actions))
         ci = (sigma**2 + 0.25).rsqrt()[:, None, None, None]
         h = self.input(torch.cat([noisy * ci, history.flatten(1, 2) * 2], 1))
         for m in self.b0:
@@ -151,6 +220,8 @@ class PixelDenoiser(nn.Module):
             h = m(h, e)
         for m in self.mid:
             h = m(h, e)
+        if self.bottleneck_attention:
+            h = self.spatial_attention(h)
         h = torch.cat([F.interpolate(h, size=s1.shape[-2:], mode="nearest"), s1], 1)
         for m in self.u1:
             h = m(h, e)
@@ -196,9 +267,24 @@ class PixelDenoiser(nn.Module):
         return x.clamp(-1, 1)
 
 
-def denoising_loss(model, history, target, actions, context_noise=0.1):
+def denoising_loss(
+    model,
+    history,
+    target,
+    actions,
+    context_noise=0.1,
+    sigma_location=-1.2,
+    sigma_scale=1.2,
+    sigma_max=5.0,
+):
+    if sigma_scale <= 0 or sigma_max < 0.002:
+        raise ValueError("Sigma scale must be positive and maximum at least 0.002")
     b = len(target)
-    s = (torch.randn(b, device=target.device) * 1.2 - 1.2).exp().clamp(0.002, 5)
+    s = (
+        (torch.randn(b, device=target.device) * sigma_scale + sigma_location)
+        .exp()
+        .clamp(0.002, sigma_max)
+    )
     hn = torch.rand(b, model.history, device=target.device) * context_noise
     hist = history + torch.randn_like(history) * hn[:, :, None, None, None]
     noise = torch.randn_like(target)
@@ -213,6 +299,8 @@ def denoising_loss(model, history, target, actions, context_noise=0.1):
     per = ((pred - target) ** 2 * weights).mean((1, 2, 3))
     return per.mean(), {
         "sigma_mean": float(s.mean()),
+        "sigma_over_one_fraction": float((s > 1).float().mean()),
+        "sigma_over_five_fraction": float((s > 5).float().mean()),
         "context_noise_mean": float(hn.mean()),
         "denoising_l1": float((pred.detach() - target).abs().mean()),
     }

@@ -42,6 +42,20 @@ class Pilot:
         self.ids = torch.from_numpy(codes["ids"].astype(np.int64))
         self.centers = codes["centers"]
         self.stride = int(codes["stride"])
+        self.event_count = int(codes["event_count"]) if "event_count" in codes else 1
+        self.event_bank = (
+            {
+                k: codes[k]
+                for k in (
+                    "flow_centers",
+                    "event_pca_mean",
+                    "event_pca_components",
+                    "event_centers",
+                )
+            }
+            if self.event_count > 1
+            else None
+        )
         self.history = 4
         self.max_generated_context = getattr(a, "generated_context_max", 2)
         if not 1 <= self.max_generated_context <= 16:
@@ -68,6 +82,10 @@ class Pilot:
             getattr(a, "prediction_mode", "frame"),
             self.centers,
             getattr(a, "noise_features", "legacy"),
+            self.event_count,
+            use_event_prior="event_prior" in codes,
+            event_prior=codes["event_prior"] if "event_prior" in codes else None,
+            bottleneck_attention=getattr(a, "bottleneck_attention", False),
         ).to(self.device)
         self.ema = copy.deepcopy(self.model).eval()
         self.opt = torch.optim.AdamW(
@@ -91,6 +109,8 @@ class Pilot:
             "supervision": "RGB-only classical flow plus train-only learned k-means codes",
             "history": 4,
             "stride": self.stride,
+            "event_count": self.event_count,
+            "codebook_sha256": hashlib.sha256(Path(a.codes).read_bytes()).hexdigest(),
             "parameters": sum(p.numel() for p in self.model.parameters()),
             "train_range": [300, 46000],
             "validation_range": [47000, 53000],
@@ -106,6 +126,7 @@ class Pilot:
                     "models/motion_codes.py",
                     "scripts/train_pixel_dynamics.py",
                 ]
+                + (["models/residual_events.py"] if self.event_count > 1 else [])
             },
         }
         (self.out / "source_at_run").mkdir(exist_ok=True)
@@ -182,9 +203,10 @@ class Pilot:
             prediction = self.ema.sample(
                 history,
                 codes[:, i : i + 4],
-                steps=3,
+                steps=getattr(self.a, "generated_context_steps", 3),
                 seed=int(self.rng.integers(2**31)),
-                heun=False,
+                heun=getattr(self.a, "generated_context_solver", "euler") == "heun",
+                stabilization=getattr(self.a, "generated_context_stabilization", 0.0),
             )
             history = torch.cat([history[:, 1:], prediction[:, None]], 1)
         return history, x[:, 4 + count], codes[:, count : count + 4], count
@@ -203,6 +225,8 @@ class Pilot:
         saved = []
         predids = []
         trueids = []
+        predicted_events = []
+        requested_events = []
         for j in range(0, len(self.val), 16):
             h, y, act = self.clips(self.val[j : j + 16])
             pred = self.ema.sample(
@@ -227,16 +251,48 @@ class Pilot:
                 heun=self.a.solver == "heun",
             )
             motion = (y - h[:, -1]).abs().mean(1, keepdim=True)
-            for name, p in [
+            predictions = [
                 ("inferred", pred),
                 ("shuffled", wrong),
                 ("constant", fixed),
                 ("copy", h[:, -1]),
-            ]:
+            ]
+            if self.event_count > 1:
+                event_wrong = act.clone()
+                event_wrong[:, -1] = (
+                    act[:, -1] // self.event_count
+                ) * self.event_count + (act[:, -1] % self.event_count).roll(1)
+                event_shuffled = self.ema.sample(
+                    h,
+                    event_wrong,
+                    self.a.sample_steps,
+                    seed=700 + j,
+                    heun=self.a.solver == "heun",
+                )
+                motion_wrong = act.clone()
+                motion_wrong[:, -1] = (act[:, -1] // self.event_count).roll(
+                    1
+                ) * self.event_count + act[:, -1] % self.event_count
+                motion_shuffled = self.ema.sample(
+                    h,
+                    motion_wrong,
+                    self.a.sample_steps,
+                    seed=700 + j,
+                    heun=self.a.solver == "heun",
+                )
+                predictions += [
+                    ("event_shuffled", event_shuffled),
+                    ("motion_shuffled", motion_shuffled),
+                ]
+            for name, p in predictions:
                 err = (p - y).abs()
+                fh, fw = err.shape[-2:]
                 vals = {
                     "l1": err.mean((1, 2, 3)),
                     "mse": ((p - y) ** 2).mean((1, 2, 3)),
+                    "foreground_l1": err[
+                        :, :, fh // 2 : fh * 58 // 64, fw * 20 // 64 : fw * 44 // 64
+                    ].mean((1, 2, 3)),
                     "motion_l1": (err * motion).sum((1, 2, 3))
                     / (motion.expand_as(err).sum((1, 2, 3)).clamp_min(1e-6)),
                 }
@@ -248,8 +304,16 @@ class Pilot:
             ds = np.stack(
                 [flow_descriptor(rgb_flow(a, b)) for a, b in zip(prev_np, pred_np)]
             )
-            predids.extend(assign_codes(ds, self.centers).tolist())
-            trueids.extend(act[:, -1].cpu().tolist())
+            flow_ids = assign_codes(ds, self.centers) // self.event_count
+            predids.extend(flow_ids.tolist())
+            trueids.extend((act[:, -1] // self.event_count).cpu().tolist())
+            if self.event_count > 1:
+                from models.residual_events import infer_events
+
+                predicted_events.extend(
+                    infer_events(prev_np, pred_np, flow_ids, self.event_bank).tolist()
+                )
+                requested_events.extend((act[:, -1] % self.event_count).cpu().tolist())
             if j == 0:
                 saved = [h[:8, -1], y[:8], pred[:8], wrong[:8], fixed[:8]]
         row = {k: float(np.mean(v)) for k, v in sums.items()}
@@ -260,8 +324,28 @@ class Pilot:
             (np.array(predids) == trueids).mean()
         )
         row["validation/generated_motion_entropy"] = code_metrics(
-            predids, len(self.centers)
+            predids, len(self.centers) // self.event_count
         )["entropy_nats"]
+        if self.event_count > 1:
+            confusion = np.zeros((self.event_count, self.event_count), dtype=np.int64)
+            np.add.at(
+                confusion,
+                (np.asarray(requested_events), np.asarray(predicted_events)),
+                1,
+            )
+            recall = np.diag(confusion) / np.maximum(1, confusion.sum(1))
+            row["validation/generated_event_code_agreement"] = float(
+                (np.array(predicted_events) == requested_events).mean()
+            )
+            row["validation/generated_event_balanced_recall"] = float(recall.mean())
+            row["validation/generated_nonmodal_event_recall"] = float(recall[1:].mean())
+            row["validation/modal_event_accuracy_baseline"] = float(
+                confusion.sum(1).max() / confusion.sum()
+            )
+            row["validation/event_shuffle_foreground_gap"] = (
+                row["validation/event_shuffled_foreground_l1"]
+                - row["validation/inferred_foreground_l1"]
+            )
         # Per-sample matched differences support later bootstrap uncertainty.
         (self.out / f"evaluation_{step:06}.json").write_text(
             json.dumps(
@@ -270,6 +354,11 @@ class Pilot:
                     "per_sample": sums,
                     "generated_motion_ids": predids,
                     "requested_ids": trueids,
+                    "predicted_event_ids": predicted_events,
+                    "requested_event_ids": requested_events,
+                    "event_confusion_matrix": (
+                        confusion.tolist() if self.event_count > 1 else None
+                    ),
                 },
                 indent=2,
             )
@@ -350,6 +439,9 @@ class Pilot:
                 "offset_noise": self.model.offset_noise,
                 "prediction_mode": self.model.prediction_mode,
                 "noise_features": self.model.noise_features,
+                "bottleneck_attention": self.model.bottleneck_attention,
+                "event_count": self.model.event_count,
+                "use_event_prior": self.model.use_event_prior,
             },
         }
         torch.save(state, self.out / "last.pt")
@@ -362,6 +454,9 @@ class Pilot:
                 "offset_noise": self.model.offset_noise,
                 "prediction_mode": self.model.prediction_mode,
                 "noise_features": self.model.noise_features,
+                "bottleneck_attention": self.model.bottleneck_attention,
+                "event_count": self.model.event_count,
+                "use_event_prior": self.model.use_event_prior,
                 "step": step,
             },
             self.out / f"ema_{step:06}.pt",
@@ -388,7 +483,14 @@ class Pilot:
                     enabled=self.device.type == "cuda",
                 ):
                     loss, detail = denoising_loss(
-                        self.model, h, y, act, self.a.context_noise
+                        self.model,
+                        h,
+                        y,
+                        act,
+                        self.a.context_noise,
+                        sigma_location=getattr(self.a, "sigma_location", -1.2),
+                        sigma_scale=getattr(self.a, "sigma_scale", 1.2),
+                        sigma_max=getattr(self.a, "sigma_max", 5.0),
                     )
                 assert torch.isfinite(loss), "Nonfinite loss"
                 loss.backward()
@@ -477,8 +579,17 @@ def main():
     p.add_argument("--conditioning", choices=["motion", "constant"], default="motion")
     p.add_argument("--generated-context-probability", type=float, default=0.0)
     p.add_argument("--generated-context-max", type=int, default=2)
+    p.add_argument("--generated-context-steps", type=int, default=3)
+    p.add_argument(
+        "--generated-context-solver", choices=["euler", "heun"], default="euler"
+    )
+    p.add_argument("--generated-context-stabilization", type=float, default=0.0)
     p.add_argument("--noise-features", choices=["legacy", "fourier"], default="legacy")
     p.add_argument("--resume")
+    p.add_argument("--bottleneck-attention", action="store_true")
+    p.add_argument("--sigma-location", type=float, default=-1.2)
+    p.add_argument("--sigma-scale", type=float, default=1.2)
+    p.add_argument("--sigma-max", type=float, default=5.0)
     Pilot(p.parse_args()).train()
 
 

@@ -1,0 +1,16 @@
+{
+  "config": {
+    "motion": "results/readiness/motion/motion_codes.npz",
+    "events": "results/readiness/residual-events/events_k4.npz",
+    "checkpoint": "results/readiness/pixel-width64-euler3-context8-25k/last.pt",
+    "output": "results/readiness/event-pilot"
+  },
+  "warm_start_step": 25000,
+  "event_count": 4,
+  "training_event_counts": [39221,2548,1606,2325],
+  "validation_event_counts": [4912,472,182,434],
+  "optimizer": "Moments explicitly reset for warm start; not an exact training resume.",
+  "supervision": "Both factor vocabularies fitted on training RGB only. No semantic or engine labels.",
+  "event_roi": [32,58,20,44],
+  "event_bank_sha256": "dedfd351d605b624e66a09c4a8e7677c2a222525cfee54d84b8b5d236cade299"
+}

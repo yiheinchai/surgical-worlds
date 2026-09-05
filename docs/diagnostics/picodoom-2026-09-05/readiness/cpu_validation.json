@@ -1,7 +1,10 @@
 {
-  "command": "WANDB_MODE=disabled MPLBACKEND=Agg OMP_NUM_THREADS=2 .venv/bin/python -m pytest -q",
-  "passed": 25,
-  "seconds": 6.27,
-  "scope": "After bounded generated-context horizon support, including 8-step target-isolation case.",
-  "recovered_checkpoint_strict_loads": ["pixel-warp-offset0-clean-15k@15000", "pixel-warp-offset0-generated-15k@15000"]
+  "command": "WANDB_MODE=disabled OMP_NUM_THREADS=2 .venv/bin/python -m pytest -q",
+  "passed": 30,
+  "seconds": 202.15,
+  "scope": "Includes factorized event warm start, neutral event prior, identity attention migration retaining optimizer/RNG state, and finite gradients at sigma 20. Local runtime varied with host load.",
+  "recovered_checkpoint_strict_loads": [
+    "pixel-warp-offset0-clean-15k@15000",
+    "pixel-warp-offset0-generated-15k@15000"
+  ]
 }

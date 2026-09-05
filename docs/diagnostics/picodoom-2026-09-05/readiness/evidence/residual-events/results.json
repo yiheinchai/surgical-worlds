@@ -1,0 +1,35 @@
+{
+  "config": {
+    "data": "data/picodoom_frames.h5",
+    "codes": "results/readiness/motion/motion_codes.npz",
+    "output": "results/readiness/residual-events"
+  },
+  "roi": [32,58,20,44],
+  "results": {
+    "4": {
+      "train": {
+        "entropy_nats": 0.5643374275440944,
+        "effective_codes": 1.7582824071988743,
+        "fractions": [0.8567177242888403,0.0638074398249453,0.037899343544857765,0.04157549234135667]
+      },
+      "validation": {
+        "entropy_nats": 0.6798515915643357,
+        "effective_codes": 1.973584813860331,
+        "fractions": [0.8133333333333334,0.07,0.04,0.07666666666666666]
+      }
+    },
+    "8": {
+      "train": {
+        "entropy_nats": 1.0480520071017512,
+        "effective_codes": 2.852089852391121,
+        "fractions": [0.7347045951859956,0.09155361050328227,0.02800875273522976,0.04341356673960613,0.03947483588621444,0.014529540481400437,0.03203501094091904,0.016280087527352296]
+      },
+      "validation": {
+        "entropy_nats": 1.188963667168184,
+        "effective_codes": 3.2836764617366314,
+        "fractions": [0.6653333333333333,0.12266666666666666,0.02666666666666667,0.06066666666666667,0.07666666666666666,0.015333333333333332,0.021333333333333333,0.011333333333333334]
+      }
+    }
+  },
+  "limitations": ["Codes represent observed residual changes, not identified player intentions.","Hand-selected foreground ROI; no engine action/state labels.","Existing temporal development range reused.","Vocabulary requires visual inspection and counterfactual validation before use."]
+}

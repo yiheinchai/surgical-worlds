@@ -43,6 +43,9 @@ def main():
             ck.get("offset_noise", 0.0),
             ck.get("prediction_mode", "frame"),
             noise_features=ck.get("noise_features", "legacy"),
+            event_count=ck.get("event_count", 1),
+            use_event_prior=ck.get("use_event_prior", False),
+            bottleneck_attention=ck.get("bottleneck_attention", False),
         )
         .to(a.device)
         .eval()
@@ -52,6 +55,20 @@ def main():
     ids = c["ids"]
     centers = c["centers"]
     stride = int(c["stride"])
+    event_count = ck.get("event_count", 1)
+    event_bank = (
+        {
+            k: c[k]
+            for k in (
+                "flow_centers",
+                "event_pca_mean",
+                "event_pca_components",
+                "event_centers",
+            )
+        }
+        if event_count > 1
+        else None
+    )
     starts = np.array([47000, 48500, 50000, 51500])
     times = []
     with h5py.File(a.data, "r") as f:
@@ -87,12 +104,23 @@ def main():
             frames = [image_array(h[:, -1])]
             l1 = []
             motionids = []
+            eventids = []
             requested = []
             edge = []
             spatial = []
             for step in range(a.frames):
                 if mode == "oracle":
                     chosen = ids[starts + (3 + step) * stride]
+                elif mode in ("pulse", "pulse_move"):
+                    if event_count < 4:
+                        raise ValueError(
+                            "Pulse probe requires four foreground event codes"
+                        )
+                    # Diagnostic onset/recovery schedule inferred by inspecting
+                    # RGB prototypes, not an engine fire-command label.
+                    event = 1 if step % 8 == 0 else 3 if step % 8 == 1 else 0
+                    motion = 6 if mode == "pulse" else 2
+                    chosen = np.full(4, motion * event_count + event)
                 elif mode == "switch":
                     chosen = np.full(4, (step // 16) % len(centers))
                 else:
@@ -117,7 +145,14 @@ def main():
                 ds = np.stack(
                     [flow_descriptor(rgb_flow(x, y)) for x, y in zip(frames[-1], arr)]
                 )
-                motionids.append(assign_codes(ds, centers).tolist())
+                flow_ids = assign_codes(ds, centers) // event_count
+                motionids.append(flow_ids.tolist())
+                if event_count > 1:
+                    from models.residual_events import infer_events
+
+                    eventids.append(
+                        infer_events(frames[-1], arr, flow_ids, event_bank).tolist()
+                    )
                 edge.append(float((pred[..., 1:] - pred[..., :-1]).abs().mean()))
                 spatial.append(float(pred.std((-2, -1)).mean()))
                 frames.append(arr)
@@ -152,11 +187,16 @@ def main():
                 "requested_codes": requested,
                 "generated_motion_codes": motionids,
                 "motion_code_agreement": float(
-                    (np.array(motionids) == requested).mean()
+                    (np.array(motionids) == np.array(requested) // event_count).mean()
                 ),
                 "edge_energy": edge,
                 "spatial_std": spatial,
             }
+            if event_count > 1:
+                reports[mode]["generated_event_codes"] = eventids
+                reports[mode]["event_code_agreement"] = float(
+                    (np.array(eventids) == np.array(requested) % event_count).mean()
+                )
             (out / "results.json").write_text(
                 json.dumps(
                     {

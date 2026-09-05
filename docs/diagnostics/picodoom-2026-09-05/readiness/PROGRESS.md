@@ -93,3 +93,9 @@ clips from fresh episode 0 at stride 2. Warping alone has better ordinary L1
 0.309810). This is mixed evidence, not a universal improvement. No fresh episodes
 were used for training; episodes 1 and 2 are still reserved. The capture smoke
 measured a median 33.18 ms interval and produced visible gameplay/muzzle animation.
+
+
+## Later experiments
+
+See [the second iteration](SECOND_ITERATION.md) for matched sampler/history tests,
+sparse-event failure, new research references, and the active scaling/attention probes.

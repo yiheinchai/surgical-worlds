@@ -23,6 +23,9 @@ def main():
     p.add_argument("--stride", type=int, default=2)
     p.add_argument("--clips", type=int, default=128)
     p.add_argument("--key-file")
+    p.add_argument("--sample-steps", type=int, default=3)
+    p.add_argument("--solver", choices=["euler", "heun"], default="euler")
+    p.add_argument("--stabilization", type=float, default=0.0)
     a = p.parse_args()
     out = Path(a.output) / a.name
     out.mkdir(parents=True, exist_ok=False)
@@ -41,6 +44,8 @@ def main():
     )
     ids = assign_codes(descriptors.reshape(-1, 32), centers).reshape(-1, 4)
     ck = torch.load(a.checkpoint, map_location="cuda", weights_only=True)
+    if ck["model_config"].get("event_count", 1) != 1:
+        raise ValueError("This transfer probe supports motion-only codebooks")
     m = PixelDenoiser(**ck["model_config"]).cuda().eval()
     m.load_state_dict(ck["ema"], strict=True)
     config = {
@@ -93,10 +98,16 @@ def main():
                 .reshape(-1, 4, 4, 2)
                 .permute(0, 3, 1, 2)
             )
+            sampler = dict(
+                steps=a.sample_steps,
+                seed=781 + j,
+                heun=a.solver == "heun",
+                stabilization=a.stabilization,
+            )
             preds = {
-                "inferred": m.sample(h, actions, 3, seed=781 + j, heun=False),
-                "shuffled": m.sample(h, wrong, 3, seed=781 + j, heun=False),
-                "modal_constant": m.sample(h, fixed, 3, seed=781 + j, heun=False),
+                "inferred": m.sample(h, actions, **sampler),
+                "shuffled": m.sample(h, wrong, **sampler),
+                "modal_constant": m.sample(h, fixed, **sampler),
                 "copy": h[:, -1],
                 "warp_only": warp_frame(h[:, -1], flow),
             }
